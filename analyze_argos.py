@@ -2,7 +2,7 @@ import os
 import csv
 from datetime import datetime
 
-ROOT = r"C:\ARGOS_AI"
+ROOT = r"C:\ARGOS_STOCK"
 TRADES_FILE = os.path.join(ROOT, "data", "trades", "paper_trades.csv")
 REPORT_DIR = os.path.join(ROOT, "data", "reports")
 ANALYSIS_FILE = os.path.join(REPORT_DIR, "argos_analysis.txt")

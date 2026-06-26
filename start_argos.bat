@@ -1,5 +1,5 @@
 @echo off
-cd /d C:\ARGOS_AI
+cd /d C:\ARGOS_STOCK
 
 start "ARGOS CORE" cmd /k py auto_loop.py
 timeout /t 2 > nul

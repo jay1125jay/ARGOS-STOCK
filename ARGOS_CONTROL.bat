@@ -1,11 +1,11 @@
 @echo off
-title ARGOS AI CONTROL
+title ARGOS STOCK CONTROL
 color 0A
 
 :MENU
 cls
 echo ==========================================
-echo        ARGOS AI CONTROL CENTER
+echo        ARGOS STOCK CONTROL CENTER
 echo ==========================================
 echo.
 echo 1. Start ARGOS CORE + DASHBOARD
@@ -26,7 +26,7 @@ if "%choice%"=="6" exit
 goto MENU
 
 :START
-cd /d C:\ARGOS_AI
+cd /d C:\ARGOS_STOCK
 start "ARGOS CORE" cmd /k py auto_loop.py
 timeout /t 2 > nul
 start "ARGOS DASHBOARD" cmd /k py app_server.py
@@ -47,7 +47,7 @@ pause
 goto MENU
 
 :STATUS
-cd /d C:\ARGOS_AI
+cd /d C:\ARGOS_STOCK
 echo.
 echo === GIT STATUS ===
 git status
@@ -61,9 +61,9 @@ pause
 goto MENU
 
 :PUSH
-cd /d C:\ARGOS_AI
+cd /d C:\ARGOS_STOCK
 git add .
-git commit -m "Update ARGOS AI"
+git commit -m "Update ARGOS STOCK"
 git push
 echo PUSH COMPLETE
 pause

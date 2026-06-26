@@ -25,7 +25,7 @@ from engines.operation_report_engine import generate_operation_report
 from engines.runtime_monitor import update_runtime_status
 
 
-BASE_DIR = r"C:\ARGOS_AI"
+BASE_DIR = r"C:\ARGOS_STOCK"
 MARKET_FILE = os.path.join(BASE_DIR, "data", "market", "market_status.json")
 
 SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "BNBUSDT"]
@@ -152,7 +152,7 @@ def main():
     ensure_files()
     trade_changed = False
 
-    print("ARGOS AI")
+    print("ARGOS STOCK")
     print("MODE=PAPER_ONLY")
     print("REAL_ORDER=FALSE")
     print("API_ORDER=FALSE")

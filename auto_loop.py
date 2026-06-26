@@ -22,7 +22,7 @@ def log(message):
 def main():
     global run_count, error_count
 
-    log("ARGOS AI AUTO LOOP START")
+    log("ARGOS STOCK AUTO LOOP START")
     log("MODE=PAPER_ONLY")
     log("REAL_ORDER=FALSE")
     log("API_ORDER=FALSE")

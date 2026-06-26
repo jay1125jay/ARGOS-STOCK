@@ -8,7 +8,7 @@ from engines.analytics_engine import analyze_trades
 from engines.health_engine import get_health
 from engines.home_summary_engine import build_home_summary
 
-ROOT = r"C:\ARGOS_AI"
+ROOT = r"C:\ARGOS_STOCK"
 APP = os.path.join(ROOT, "app")
 
 TRADES = os.path.join(ROOT, "data", "trades", "paper_trades.csv")

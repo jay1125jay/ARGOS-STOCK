@@ -1,23 +1,23 @@
 import os
 
-BASE_DIR = r"C:\ARGOS_AI"
+BASE_DIR = r"C:\ARGOS_STOCK"
 
 CHECKS = [
-    r"C:\ARGOS_AI\run_argos.py",
-    r"C:\ARGOS_AI\app_server.py",
-    r"C:\ARGOS_AI\engines\technical_engine.py",
-    r"C:\ARGOS_AI\engines\position_manager.py",
-    r"C:\ARGOS_AI\engines\risk_engine.py",
-    r"C:\ARGOS_AI\engines\analytics_engine.py",
-    r"C:\ARGOS_AI\engines\config_loader.py",
-    r"C:\ARGOS_AI\engines\decision_logger.py",
-    r"C:\ARGOS_AI\engines\cooldown_engine.py",
-    r"C:\ARGOS_AI\config\settings.json",
-    r"C:\ARGOS_AI\config\strategy.json",
-    r"C:\ARGOS_AI\data\trades\paper_trades.csv",
-    r"C:\ARGOS_AI\data\reports\report.csv",
-    r"C:\ARGOS_AI\data\open_positions.json",
-    r"C:\ARGOS_AI\data\cooldown.json"
+    r"C:\ARGOS_STOCK\run_argos.py",
+    r"C:\ARGOS_STOCK\app_server.py",
+    r"C:\ARGOS_STOCK\engines\technical_engine.py",
+    r"C:\ARGOS_STOCK\engines\position_manager.py",
+    r"C:\ARGOS_STOCK\engines\risk_engine.py",
+    r"C:\ARGOS_STOCK\engines\analytics_engine.py",
+    r"C:\ARGOS_STOCK\engines\config_loader.py",
+    r"C:\ARGOS_STOCK\engines\decision_logger.py",
+    r"C:\ARGOS_STOCK\engines\cooldown_engine.py",
+    r"C:\ARGOS_STOCK\config\settings.json",
+    r"C:\ARGOS_STOCK\config\strategy.json",
+    r"C:\ARGOS_STOCK\data\trades\paper_trades.csv",
+    r"C:\ARGOS_STOCK\data\reports\report.csv",
+    r"C:\ARGOS_STOCK\data\open_positions.json",
+    r"C:\ARGOS_STOCK\data\cooldown.json"
 ]
 
 def run_health_check():

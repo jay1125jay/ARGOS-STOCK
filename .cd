@@ -3,7 +3,7 @@ import csv
 import subprocess
 from datetime import datetime
 
-ROOT = r"C:\ARGOS_AI"
+ROOT = r"C:\ARGOS_STOCK"
 RUN_FILE = os.path.join(ROOT, "run_argos.py")
 LOG_DIR = os.path.join(ROOT, "logs")
 DATA_DIR = os.path.join(ROOT, "data")
