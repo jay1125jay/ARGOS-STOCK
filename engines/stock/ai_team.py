@@ -4,6 +4,7 @@ from engines.stock.earnings_ai import run as earnings_ai
 from engines.stock.sector_ai import run as sector_ai
 from engines.stock.money_flow_ai import run as money_flow_ai
 from engines.stock.technical_ai import run as technical_ai
+from engines.stock.risk_ai import run as risk_ai
 
 
 class AITeam:
@@ -16,7 +17,8 @@ class AITeam:
             "earnings": earnings_ai,
             "sector": sector_ai,
             "money_flow": money_flow_ai,
-            "technical": technical_ai
+            "technical": technical_ai,
+            "risk": risk_ai
         }
 
     def run(self):
@@ -32,6 +34,7 @@ class AITeam:
 if __name__ == "__main__":
 
     ai = AITeam()
+
     data = ai.run()
 
     print("=" * 60)
