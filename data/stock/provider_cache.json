@@ -1,0 +1,105 @@
+{
+  "project": "ARGOS_STOCK",
+  "mode": "PAPER_ONLY",
+  "real_order": false,
+  "api_order": false,
+  "auto_real_order": false,
+  "updated_at": "2026-06-26 23:32:36",
+  "data": {
+    "providers": {
+      "kr_market": {
+        "provider": "KR_MARKET",
+        "status": "READY",
+        "market": "KOREA",
+        "connected": false,
+        "symbols": [],
+        "updated_at": "2026-06-26 23:32:36"
+      },
+      "us_market": {
+        "provider": "US_MARKET",
+        "status": "READY",
+        "market": "USA",
+        "connected": false,
+        "symbols": [],
+        "updated_at": "2026-06-26 23:32:36"
+      },
+      "news": {
+        "provider": "NEWS",
+        "status": "READY",
+        "connected": false,
+        "source": "NONE",
+        "articles": [],
+        "updated_at": "2026-06-26 23:32:36"
+      },
+      "dart": {
+        "provider": "DART",
+        "status": "READY",
+        "market": "KOREA",
+        "connected": false,
+        "disclosures": [],
+        "updated_at": "2026-06-26 23:32:36"
+      },
+      "sec": {
+        "provider": "SEC",
+        "status": "READY",
+        "market": "USA",
+        "connected": false,
+        "filings": [],
+        "updated_at": "2026-06-26 23:32:36"
+      }
+    },
+    "adapters": {
+      "yahoo": {
+        "provider": "Yahoo",
+        "status": "READY",
+        "connected": false,
+        "paper_only": true,
+        "symbols": [],
+        "updated_at": "2026-06-26 23:32:36"
+      },
+      "kis": {
+        "provider": "KIS",
+        "status": "READY",
+        "connected": false,
+        "paper_only": true,
+        "market": "KOREA",
+        "symbols": [],
+        "updated_at": "2026-06-26 23:32:36"
+      },
+      "news": {
+        "provider": "NewsAPI",
+        "status": "READY",
+        "connected": false,
+        "paper_only": true,
+        "articles": [],
+        "updated_at": "2026-06-26 23:32:36"
+      },
+      "dart": {
+        "provider": "DART",
+        "status": "READY",
+        "connected": false,
+        "paper_only": true,
+        "market": "KOREA",
+        "disclosures": [],
+        "updated_at": "2026-06-26 23:32:36"
+      },
+      "sec": {
+        "provider": "SEC",
+        "status": "READY",
+        "connected": false,
+        "paper_only": true,
+        "market": "USA",
+        "filings": [],
+        "updated_at": "2026-06-26 23:32:36"
+      },
+      "fred": {
+        "provider": "FRED",
+        "status": "READY",
+        "connected": false,
+        "paper_only": true,
+        "macro": {},
+        "updated_at": "2026-06-26 23:32:36"
+      }
+    }
+  }
+}
