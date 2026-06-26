@@ -5,11 +5,11 @@ from datetime import datetime
 ROOT = r"C:\ARGOS_STOCK"
 OUT = os.path.join(ROOT, "data", "stock", "head_ai_status.json")
 
-from news_ai import run as news_run
-from disclosure_ai import run as disclosure_run
-from earnings_ai import run as earnings_run
-from sector_ai import run as sector_run
-from money_flow_ai import run as money_flow_run
+from engines.stock.news_ai import run as news_run
+from engines.stock.disclosure_ai import run as disclosure_run
+from engines.stock.earnings_ai import run as earnings_run
+from engines.stock.sector_ai import run as sector_run
+from engines.stock.money_flow_ai import run as money_flow_run
 
 def decide(modules):
     risks = [m.get("risk", "UNKNOWN") for m in modules.values()]

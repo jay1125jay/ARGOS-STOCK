@@ -1,0 +1,11 @@
+{
+  "project": "ARGOS_STOCK",
+  "mode": "PAPER_ONLY",
+  "real_order": false,
+  "api_order": false,
+  "auto_real_order": false,
+  "signal": "WAIT",
+  "approved": false,
+  "reason": "NO_STRONG_CONSENSUS",
+  "updated_at": "2026-06-26 21:07:40"
+}

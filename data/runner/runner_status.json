@@ -1,0 +1,10 @@
+{
+  "project": "ARGOS_STOCK",
+  "engine": "PaperRunner",
+  "mode": "PAPER_ONLY",
+  "running": false,
+  "real_order": false,
+  "api_order": false,
+  "auto_real_order": false,
+  "updated_at": "2026-06-26 21:07:40"
+}
