@@ -1,0 +1,33 @@
+{
+  "paper_only": true,
+
+  "kr_market": {
+    "enabled": true,
+    "provider": "KIS"
+  },
+
+  "us_market": {
+    "enabled": true,
+    "provider": "Yahoo"
+  },
+
+  "news": {
+    "enabled": true,
+    "provider": "NewsAPI"
+  },
+
+  "dart": {
+    "enabled": true,
+    "provider": "DART"
+  },
+
+  "sec": {
+    "enabled": true,
+    "provider": "SEC"
+  },
+
+  "macro": {
+    "enabled": true,
+    "provider": "FRED"
+  }
+}
