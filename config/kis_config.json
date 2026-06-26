@@ -1,0 +1,16 @@
+{
+  "project": "ARGOS_STOCK",
+  "mode": "PAPER_ONLY",
+  "real_order": false,
+  "api_order": false,
+  "auto_real_order": false,
+  "kis": {
+    "enabled": true,
+    "mock_mode": true,
+    "base_url": "https://openapivts.koreainvestment.com:29443",
+    "app_key": "",
+    "app_secret": "",
+    "token_path": "data/stock/kis_token.json",
+    "cache_path": "data/stock/kis_cache.json"
+  }
+}
