@@ -1,0 +1,55 @@
+{
+  "project": "ARGOS_STOCK",
+  "mode": "PAPER_ONLY",
+  "real_order": false,
+  "api_order": false,
+  "auto_real_order": false,
+  "updated_at": "2026-06-26 20:32:33",
+  "stock_ai_team": {
+    "news_ai": {
+      "engine": "news_ai",
+      "status": "READY",
+      "mode": "PAPER_ONLY",
+      "signal": "WAIT",
+      "risk": "UNKNOWN",
+      "summary": "Stock news engine skeleton ready.",
+      "updated_at": "2026-06-26 20:32:33"
+    },
+    "disclosure_ai": {
+      "engine": "disclosure_ai",
+      "status": "READY",
+      "mode": "PAPER_ONLY",
+      "signal": "WAIT",
+      "risk": "UNKNOWN",
+      "summary": "KR disclosure engine skeleton ready.",
+      "updated_at": "2026-06-26 20:32:33"
+    },
+    "earnings_ai": {
+      "engine": "earnings_ai",
+      "status": "READY",
+      "mode": "PAPER_ONLY",
+      "signal": "WAIT",
+      "risk": "UNKNOWN",
+      "summary": "US/KR earnings engine skeleton ready.",
+      "updated_at": "2026-06-26 20:32:33"
+    },
+    "sector_ai": {
+      "engine": "sector_ai",
+      "status": "READY",
+      "mode": "PAPER_ONLY",
+      "signal": "WAIT",
+      "risk": "UNKNOWN",
+      "summary": "Sector strength engine skeleton ready.",
+      "updated_at": "2026-06-26 20:32:33"
+    },
+    "money_flow_ai": {
+      "engine": "money_flow_ai",
+      "status": "READY",
+      "mode": "PAPER_ONLY",
+      "signal": "WAIT",
+      "risk": "UNKNOWN",
+      "summary": "Money flow engine skeleton ready.",
+      "updated_at": "2026-06-26 20:32:33"
+    }
+  }
+}
