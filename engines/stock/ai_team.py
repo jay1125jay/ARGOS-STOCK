@@ -5,6 +5,7 @@ from engines.stock.sector_ai import run as sector_ai
 from engines.stock.money_flow_ai import run as money_flow_ai
 from engines.stock.technical_ai import run as technical_ai
 from engines.stock.risk_ai import run as risk_ai
+from engines.stock.market_state_ai import run as market_state_ai
 
 
 class AITeam:
@@ -18,7 +19,8 @@ class AITeam:
             "sector": sector_ai,
             "money_flow": money_flow_ai,
             "technical": technical_ai,
-            "risk": risk_ai
+            "risk": risk_ai,
+            "market_state": market_state_ai
         }
 
     def run(self):
@@ -38,7 +40,9 @@ if __name__ == "__main__":
     data = ai.run()
 
     print("=" * 60)
+
     print("AI TEAM READY")
+
     print("=" * 60)
 
     for k in data:
