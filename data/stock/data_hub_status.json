@@ -1,110 +1,23 @@
 {
   "project": "ARGOS_STOCK",
-  "engine": "data_hub",
   "mode": "PAPER_ONLY",
   "real_order": false,
   "api_order": false,
   "auto_real_order": false,
-  "updated_at": "2026-06-26 20:35:53",
-  "data_sections": {
-    "kr_price": {
-      "name": "KR_PRICE",
-      "status": "READY",
-      "mode": "PAPER_ONLY",
-      "source": "PLACEHOLDER",
-      "connected": false,
-      "last_update": null,
-      "note": "Structure ready. API connection will be added later."
-    },
-    "us_price": {
-      "name": "US_PRICE",
-      "status": "READY",
-      "mode": "PAPER_ONLY",
-      "source": "PLACEHOLDER",
-      "connected": false,
-      "last_update": null,
-      "note": "Structure ready. API connection will be added later."
-    },
-    "dart_disclosure": {
-      "name": "DART_DISCLOSURE",
-      "status": "READY",
-      "mode": "PAPER_ONLY",
-      "source": "PLACEHOLDER",
-      "connected": false,
-      "last_update": null,
-      "note": "Structure ready. API connection will be added later."
-    },
-    "sec_filing": {
-      "name": "SEC_FILING",
-      "status": "READY",
-      "mode": "PAPER_ONLY",
-      "source": "PLACEHOLDER",
-      "connected": false,
-      "last_update": null,
-      "note": "Structure ready. API connection will be added later."
-    },
-    "news": {
-      "name": "NEWS",
-      "status": "READY",
-      "mode": "PAPER_ONLY",
-      "source": "PLACEHOLDER",
-      "connected": false,
-      "last_update": null,
-      "note": "Structure ready. API connection will be added later."
-    },
-    "earnings": {
-      "name": "EARNINGS",
-      "status": "READY",
-      "mode": "PAPER_ONLY",
-      "source": "PLACEHOLDER",
-      "connected": false,
-      "last_update": null,
-      "note": "Structure ready. API connection will be added later."
-    },
-    "sector": {
-      "name": "SECTOR",
-      "status": "READY",
-      "mode": "PAPER_ONLY",
-      "source": "PLACEHOLDER",
-      "connected": false,
-      "last_update": null,
-      "note": "Structure ready. API connection will be added later."
-    },
-    "money_flow": {
-      "name": "MONEY_FLOW",
-      "status": "READY",
-      "mode": "PAPER_ONLY",
-      "source": "PLACEHOLDER",
-      "connected": false,
-      "last_update": null,
-      "note": "Structure ready. API connection will be added later."
-    },
-    "fx_rate": {
-      "name": "FX_RATE",
-      "status": "READY",
-      "mode": "PAPER_ONLY",
-      "source": "PLACEHOLDER",
-      "connected": false,
-      "last_update": null,
-      "note": "Structure ready. API connection will be added later."
-    },
-    "macro": {
-      "name": "MACRO",
-      "status": "READY",
-      "mode": "PAPER_ONLY",
-      "source": "PLACEHOLDER",
-      "connected": false,
-      "last_update": null,
-      "note": "Structure ready. API connection will be added later."
-    },
-    "vix": {
-      "name": "VIX",
-      "status": "READY",
-      "mode": "PAPER_ONLY",
-      "source": "PLACEHOLDER",
-      "connected": false,
-      "last_update": null,
-      "note": "Structure ready. API connection will be added later."
-    }
+  "updated_at": "2026-06-26 21:18:51",
+  "market": {
+    "kr": "READY",
+    "us": "READY"
+  },
+  "sources": {
+    "news": "READY",
+    "dart": "READY",
+    "sec": "READY",
+    "earnings": "READY",
+    "sector": "READY",
+    "money_flow": "READY",
+    "macro": "READY",
+    "fx": "READY",
+    "vix": "READY"
   }
 }
