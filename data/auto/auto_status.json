@@ -1,7 +1,7 @@
 {
   "engine": "ARGOS_AUTO_SELECTOR_V15",
   "mode": "PAPER_ONLY",
-  "updated_at": "2026-06-26 14:30:55",
+  "updated_at": "2026-06-26 15:13:54",
   "auto_start_ready": true,
   "real_order_enabled": false,
   "api_order_enabled": false,
@@ -9,8 +9,8 @@
   "selected": {
     "market": "CRYPTO",
     "symbol": "ETHUSDT",
-    "action": "LONG",
-    "score": 85.0,
+    "action": "SHORT",
+    "score": 15.0,
     "risk_score": 20.0,
     "priority": 90,
     "status": "ACTIVE",
@@ -21,8 +21,8 @@
     {
       "market": "CRYPTO",
       "symbol": "ETHUSDT",
-      "action": "LONG",
-      "score": 85.0,
+      "action": "SHORT",
+      "score": 15.0,
       "risk_score": 20.0,
       "priority": 90,
       "status": "ACTIVE",

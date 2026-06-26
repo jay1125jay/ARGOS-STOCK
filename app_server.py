@@ -30,7 +30,7 @@ PAPER_ROUTER = os.path.join(ROOT, "data", "execution", "paper_router_status.json
 AUTO = os.path.join(ROOT, "data", "auto", "auto_status.json")
 SETTINGS = os.path.join(ROOT, "data", "config", "settings.json")
 SESSION = os.path.join(ROOT, "data", "reports", "paper_session.json")
-
+RUNTIME = os.path.join(ROOT, "data", "system", "runtime_status.json")
 
 def read_csv(path):
     if not os.path.exists(path):
@@ -133,6 +133,7 @@ class Handler(BaseHTTPRequestHandler):
             auto = read_json(AUTO)
             session = read_json(SESSION) 
             settings = read_json(SETTINGS)
+            runtime = read_json(RUNTIME)
                       
             latest_report = {
                 "total_trades": 0,
@@ -189,6 +190,7 @@ class Handler(BaseHTTPRequestHandler):
                 "auto": auto,
                 "home_summary": home_summary,
                 "settings": settings,
+                "runtime": runtime,
                 "session": session,
 
             }).encode("utf-8")

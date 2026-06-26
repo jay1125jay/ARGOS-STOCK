@@ -1,7 +1,7 @@
 {
   "mode": "PAPER_ONLY",
   "engine": "ARGOS_PAPER_ROUTER_V2",
-  "updated_at": "2026-06-26 14:30:55",
+  "updated_at": "2026-06-26 15:13:54",
   "status": "WAIT",
   "reason": "Execution engine has no paper-ready order.",
   "source_symbol": "ETHUSDT",

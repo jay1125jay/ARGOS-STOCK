@@ -1,0 +1,15 @@
+{
+  "engine": "ARGOS_RUNTIME_MONITOR_V30",
+  "status": "RUNNING",
+  "started_at": "2026-06-26 15:07:14",
+  "last_update": "2026-06-26 15:13:54",
+  "runtime_seconds": 400,
+  "runtime_text": "00:06:40",
+  "loops": 2,
+  "health": "GOOD",
+  "last_error": "",
+  "paper_mode": true,
+  "real_order_enabled": false,
+  "api_order_enabled": false,
+  "auto_real_order_enabled": false
+}
