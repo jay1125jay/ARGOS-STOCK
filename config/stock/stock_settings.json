@@ -1,0 +1,29 @@
+{
+  "project": "ARGOS_STOCK",
+  "mode": "PAPER_ONLY",
+  "real_order": false,
+  "api_order": false,
+  "auto_real_order": false,
+  "markets": ["KR", "US"],
+  "kr_watchlist": [
+    "005930",
+    "000660",
+    "035420",
+    "035720",
+    "051910",
+    "006400",
+    "207940",
+    "068270"
+  ],
+  "us_watchlist": [
+    "NVDA",
+    "TSLA",
+    "AAPL",
+    "MSFT",
+    "AMD",
+    "GOOGL",
+    "META",
+    "QQQ",
+    "SPY"
+  ]
+}

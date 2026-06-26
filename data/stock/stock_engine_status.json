@@ -1,0 +1,41 @@
+{
+  "project": "ARGOS_STOCK",
+  "mode": "PAPER_ONLY",
+  "real_order": false,
+  "api_order": false,
+  "auto_real_order": false,
+  "updated_at": "2026-06-26 20:30:41",
+  "engines": {
+    "news_ai": "READY",
+    "disclosure_ai": "READY",
+    "earnings_ai": "READY",
+    "sector_ai": "READY",
+    "money_flow_ai": "READY",
+    "head_ai": "READY"
+  },
+  "markets": [
+    "KR",
+    "US"
+  ],
+  "kr_watchlist": [
+    "005930",
+    "000660",
+    "035420",
+    "035720",
+    "051910",
+    "006400",
+    "207940",
+    "068270"
+  ],
+  "us_watchlist": [
+    "NVDA",
+    "TSLA",
+    "AAPL",
+    "MSFT",
+    "AMD",
+    "GOOGL",
+    "META",
+    "QQQ",
+    "SPY"
+  ]
+}
