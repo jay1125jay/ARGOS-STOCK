@@ -1,96 +1,53 @@
-import json
-import os
 import time
-from datetime import datetime
 
-ROOT = r"C:\ARGOS_STOCK"
-
-RUNNER_STATUS = os.path.join(ROOT, "data", "runner", "runner_status.json")
-DECISION = os.path.join(ROOT, "data", "decision", "final_decision.json")
-PORTFOLIO = os.path.join(ROOT, "data", "portfolio", "account.json")
-POSITIONS = os.path.join(ROOT, "data", "portfolio", "positions.json")
-HISTORY = os.path.join(ROOT, "data", "history", "trade_history.json")
-
-
-def ensure():
-    os.makedirs(os.path.dirname(RUNNER_STATUS), exist_ok=True)
-    os.makedirs(os.path.dirname(DECISION), exist_ok=True)
-    os.makedirs(os.path.dirname(PORTFOLIO), exist_ok=True)
-    os.makedirs(os.path.dirname(HISTORY), exist_ok=True)
-
-
-def load(path, default):
-    if not os.path.exists(path):
-        return default
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except:
-        return default
-
-
-def save(path, data):
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+from engines.stock.data_hub import DataHub
+from engines.stock.chief_ai import ChiefAI
+from engines.stock.decision_center import DecisionCenter
+from engines.stock.portfolio_engine import PortfolioEngine
+from engines.stock.history_engine import HistoryEngine
 
 
 class PaperRunner:
 
     def __init__(self):
-        ensure()
-        self.mode = "PAPER_ONLY"
-        self.running = False
 
-    def heartbeat(self):
-        status = {
-            "project": "ARGOS_STOCK",
-            "engine": "PaperRunner",
-            "mode": self.mode,
-            "running": self.running,
-            "real_order": False,
-            "api_order": False,
-            "auto_real_order": False,
-            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-        save(RUNNER_STATUS, status)
+        self.datahub = DataHub()
 
-    def cycle(self):
+        self.chief = ChiefAI()
 
-        decision = load(DECISION, {
-            "signal": "WAIT"
-        })
+        self.decision = DecisionCenter()
 
-        account = load(PORTFOLIO, {})
-        positions = load(POSITIONS, [])
-        history = load(HISTORY, [])
+        self.portfolio = PortfolioEngine()
+
+        self.history = HistoryEngine()
+
+    def loop(self):
+
+        self.datahub.save()
+
+        ai = self.chief.decide()
+
+        decision = self.decision.evaluate(ai)
 
         print("=" * 60)
-        print("ARGOS STOCK PAPER RUNNER")
-        print("MODE :", self.mode)
-        print("SIGNAL :", decision.get("signal", "WAIT"))
-        print("ACCOUNT :", account.get("cash", 0))
-        print("POSITIONS :", len(positions))
-        print("HISTORY :", len(history))
+        print("ARGOS STOCK PAPER")
+        print("AI :", ai["signal"])
+        print("FINAL :", decision["signal"])
+        print("ACCOUNT :", self.portfolio.account["cash"])
+        print("POSITION :", len(self.portfolio.positions))
+        print("HISTORY :", len(self.history.get_all()))
 
     def start(self):
 
-        self.running = True
+        print("PAPER RUNNER START")
 
-        while self.running:
+        while True:
 
-            self.heartbeat()
-
-            self.cycle()
+            self.loop()
 
             time.sleep(3)
-
-    def stop(self):
-
-        self.running = False
 
 
 if __name__ == "__main__":
 
-    runner = PaperRunner()
-
-    runner.start()
+    PaperRunner().start()
