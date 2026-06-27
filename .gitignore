@@ -16,3 +16,5 @@ config/kis_secret.json
 data/stock/kis_token.json
 data/stock/kis_cache.json
 data/scheduler/
+data/dart/
+data/news/stock_news_ai.json
