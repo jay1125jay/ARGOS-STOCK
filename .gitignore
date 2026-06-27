@@ -24,3 +24,5 @@ data/market_state/
 data/macro/macro_ai_status.json
 data/us/
 data/earnings/
+data/report/
+reports/
