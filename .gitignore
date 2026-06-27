@@ -29,3 +29,5 @@ reports/
 data/risk/
 data/system/
 data/technical/
+data/runner/auto_runner_status.json
+data/runner/auto_runner_stop.flag

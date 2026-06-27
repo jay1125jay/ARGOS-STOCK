@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>ARGOS STOCK CONTROL CENTER</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>ARGOS STOCK</h1>
+      <span id="apiStatus">API CHECKING...</span>
+    </header>
+
+    <section class="grid">
+      <div class="card big">
+        <h2>FINAL DECISION</h2>
+        <div id="finalSignal" class="signal">-</div>
+        <p>Score: <b id="totalScore">-</b></p>
+        <p>Mode: <b id="mode">-</b></p>
+      </div>
+
+      <div class="card">
+        <h2>HEALTH</h2>
+        <div id="health" class="health">-</div>
+        <p><span id="okCount">-</span> / <span id="totalCount">-</span></p>
+      </div>
+
+      <div class="card">
+        <h2>ACCOUNT</h2>
+        <p>Cash: <b id="cash">-</b></p>
+        <p>Equity: <b id="equity">-</b></p>
+        <p>Total PnL: <b id="pnl">-</b></p>
+      </div>
+
+      <div class="card">
+        <h2>EXECUTION</h2>
+        <p>Signal: <b id="execSignal">-</b></p>
+        <p>Action: <b id="execAction">-</b></p>
+        <p>Positions: <b id="execPositions">-</b></p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>AI STATUS</h2>
+      <div id="aiStatus" class="ai-list"></div>
+    </section>
+
+    <section class="card">
+      <h2>MODULE SCORES</h2>
+      <div id="modules" class="modules"></div>
+    </section>
+
+    <section class="card">
+      <h2>SYSTEM</h2>
+      <pre id="systemBox">Loading...</pre>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
