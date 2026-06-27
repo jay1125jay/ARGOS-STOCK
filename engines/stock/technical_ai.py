@@ -5,14 +5,24 @@ from datetime import datetime
 
 ROOT = r"C:\ARGOS_STOCK"
 KIS_CACHE = os.path.join(ROOT, "data", "stock", "kis_cache.json")
+OUT = os.path.join(ROOT, "data", "technical", "technical_status.json")
+
+
+def save_json(data):
+    os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    with open(OUT, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
 
 def load_json(path, default):
     if not os.path.exists(path):
         return default
 
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return default
 
 
 def analyze_quote(q):
@@ -64,11 +74,10 @@ def analyze_quote(q):
 
 def run():
     cache = load_json(KIS_CACHE, {})
-
     quotes = cache.get("quotes", [])
 
     if not quotes:
-        return {
+        result = {
             "engine": "technical_ai",
             "status": "NO_KIS_CACHE",
             "mode": "PAPER_ONLY",
@@ -80,13 +89,20 @@ def run():
             "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
 
+        save_json(result)
+        return result
+
     items = []
     for q in quotes:
         items.append(analyze_quote(q))
 
-    best = sorted(items, key=lambda x: x.get("score", 0), reverse=True)[0]
+    best = sorted(
+        items,
+        key=lambda x: x.get("score", 0),
+        reverse=True
+    )[0]
 
-    return {
+    result = {
         "engine": "technical_ai",
         "status": "READY",
         "mode": "PAPER_ONLY",
@@ -97,6 +113,9 @@ def run():
         "items": items,
         "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
+
+    save_json(result)
+    return result
 
 
 if __name__ == "__main__":
