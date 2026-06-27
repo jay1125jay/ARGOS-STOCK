@@ -8,6 +8,7 @@ import requests
 
 ROOT = r"C:\ARGOS_STOCK"
 KIS_CONFIG = os.path.join(ROOT, "config", "kis_config.json")
+KIS_SECRET = os.path.join(ROOT, "config", "kis_secret.json")
 STOCK_SETTINGS = os.path.join(ROOT, "config", "stock", "stock_settings.json")
 KIS_CACHE = os.path.join(ROOT, "data", "stock", "kis_cache.json")
 KIS_TOKEN = os.path.join(ROOT, "data", "stock", "kis_token.json")
@@ -16,25 +17,41 @@ KIS_TOKEN = os.path.join(ROOT, "data", "stock", "kis_token.json")
 class KISAdapter:
     def __init__(self):
         self.config = self.load_json(KIS_CONFIG, {})
+        self.secret = self.load_json(KIS_SECRET, {})
         self.settings = self.load_json(STOCK_SETTINGS, {})
         self.kis = self.config.get("kis", {})
 
     def load_json(self, path, default):
         if not os.path.exists(path):
             return default
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return default
 
     def save_json(self, path, data):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
-    def has_keys(self):
-        return bool(self.kis.get("app_key")) and bool(self.kis.get("app_secret"))
-
     def now(self):
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    def app_key(self):
+        return self.secret.get("app_key", "") or self.kis.get("app_key", "")
+
+    def app_secret(self):
+        return self.secret.get("app_secret", "") or self.kis.get("app_secret", "")
+
+    def base_url(self):
+        return self.kis.get(
+            "base_url",
+            "https://openapivts.koreainvestment.com:29443"
+        )
+
+    def has_keys(self):
+        return bool(self.app_key()) and bool(self.app_secret())
 
     def get_token(self):
         if os.path.exists(KIS_TOKEN):
@@ -49,7 +66,7 @@ class KISAdapter:
         if not self.has_keys():
             return ""
 
-        url = self.kis.get("base_url", "").rstrip("/") + "/oauth2/tokenP"
+        url = self.base_url().rstrip("/") + "/oauth2/tokenP"
 
         headers = {
             "content-type": "application/json"
@@ -57,12 +74,17 @@ class KISAdapter:
 
         body = {
             "grant_type": "client_credentials",
-            "appkey": self.kis.get("app_key", ""),
-            "appsecret": self.kis.get("app_secret", "")
+            "appkey": self.app_key(),
+            "appsecret": self.app_secret()
         }
 
         try:
-            res = requests.post(url, headers=headers, data=json.dumps(body), timeout=10)
+            res = requests.post(
+                url,
+                headers=headers,
+                data=json.dumps(body),
+                timeout=10
+            )
 
             if res.status_code != 200:
                 self.save_json(KIS_TOKEN, {
@@ -110,13 +132,16 @@ class KISAdapter:
         }
 
     def get_domestic_quote(self, token, symbol):
-        url = self.kis.get("base_url", "").rstrip("/") + "/uapi/domestic-stock/v1/quotations/inquire-price"
+        url = (
+            self.base_url().rstrip("/")
+            + "/uapi/domestic-stock/v1/quotations/inquire-price"
+        )
 
         headers = {
             "content-type": "application/json; charset=utf-8",
             "authorization": "Bearer " + token,
-            "appkey": self.kis.get("app_key", ""),
-            "appsecret": self.kis.get("app_secret", ""),
+            "appkey": self.app_key(),
+            "appsecret": self.app_secret(),
             "tr_id": "FHKST01010100"
         }
 
@@ -126,7 +151,12 @@ class KISAdapter:
         }
 
         try:
-            res = requests.get(url, headers=headers, params=params, timeout=10)
+            res = requests.get(
+                url,
+                headers=headers,
+                params=params,
+                timeout=10
+            )
 
             if res.status_code != 200:
                 return {
