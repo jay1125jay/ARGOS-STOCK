@@ -29,34 +29,45 @@ def analyze_quote(q):
     symbol = q.get("symbol", "")
     price = float(q.get("price", 0) or 0)
     change_rate = float(q.get("change_rate", 0) or 0)
-    volume = int(q.get("volume", 0) or 0)
+    volume = int(float(q.get("volume", 0) or 0))
 
     score = 0
     reasons = []
 
     if price <= 0:
+        score -= 100
         reasons.append("NO_PRICE")
     else:
         reasons.append("PRICE_OK")
 
-    if change_rate > 1.0:
+    if change_rate >= 3.0:
+        score += 35
+        reasons.append("STRONG_MOMENTUM_UP")
+    elif change_rate >= 1.0:
         score += 20
         reasons.append("MOMENTUM_UP")
-    elif change_rate < -1.0:
+    elif change_rate <= -3.0:
+        score -= 35
+        reasons.append("STRONG_MOMENTUM_DOWN")
+    elif change_rate <= -1.0:
         score -= 20
         reasons.append("MOMENTUM_DOWN")
     else:
         reasons.append("MOMENTUM_FLAT")
 
-    if volume >= 1000000:
+    if volume >= 3000000:
+        score += 20
+        reasons.append("VOLUME_STRONG")
+    elif volume >= 1000000:
         score += 10
         reasons.append("VOLUME_OK")
     else:
+        score -= 5
         reasons.append("VOLUME_LOW")
 
-    if score >= 25:
+    if score >= 35:
         signal = "BUY"
-    elif score <= -25:
+    elif score <= -35:
         signal = "SELL"
     else:
         signal = "WAIT"
@@ -84,6 +95,8 @@ def run():
             "signal": "WAIT",
             "score": 0,
             "best_symbol": "",
+            "best_price": 0,
+            "top20": [],
             "reason": "KIS cache not found or empty.",
             "items": [],
             "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -92,15 +105,16 @@ def run():
         save_json(result)
         return result
 
-    items = []
-    for q in quotes:
-        items.append(analyze_quote(q))
+    items = [analyze_quote(q) for q in quotes]
 
-    best = sorted(
+    ranked = sorted(
         items,
         key=lambda x: x.get("score", 0),
         reverse=True
-    )[0]
+    )
+
+    best = ranked[0]
+    top20 = ranked[:20]
 
     result = {
         "engine": "technical_ai",
@@ -109,7 +123,11 @@ def run():
         "signal": best.get("signal", "WAIT"),
         "score": best.get("score", 0),
         "best_symbol": best.get("symbol", ""),
+        "best_price": best.get("price", 0),
+        "best_change_rate": best.get("change_rate", 0),
+        "best_volume": best.get("volume", 0),
         "reason": best.get("reason", ""),
+        "top20": top20,
         "items": items,
         "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }

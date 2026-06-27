@@ -8,7 +8,13 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>ARGOS STOCK</h1>
+      <div>
+        <h1>ARGOS STOCK</h1>
+        <div class="controls">
+          <button id="btnStart">START</button>
+          <button id="btnStop">STOP</button>
+        </div>
+      </div>
       <span id="apiStatus">API CHECKING...</span>
     </header>
 
@@ -18,6 +24,16 @@
         <div id="finalSignal" class="signal">-</div>
         <p>Score: <b id="totalScore">-</b></p>
         <p>Mode: <b id="mode">-</b></p>
+        <p>Symbol: <b id="selectedSymbol">-</b></p>
+        <p>Price: <b id="selectedPrice">-</b></p>
+      </div>
+
+      <div class="card">
+        <h2>RUNNER</h2>
+        <p>Running: <b id="runnerStatus">-</b></p>
+        <p>Loop: <b id="loopCount">-</b></p>
+        <p>History: <b id="historyCount">-</b></p>
+        <p>Win Rate: <b id="winRate">-</b></p>
       </div>
 
       <div class="card">
@@ -44,6 +60,11 @@
     <section class="card">
       <h2>AI STATUS</h2>
       <div id="aiStatus" class="ai-list"></div>
+    </section>
+
+    <section class="card">
+      <h2>TOP 20 STOCKS</h2>
+      <div id="top20"></div>
     </section>
 
     <section class="card">

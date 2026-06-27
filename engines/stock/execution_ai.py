@@ -45,9 +45,9 @@ class ExecutionAI:
         if signal == "BUY":
             if len(portfolio.positions) == 0:
                 portfolio.add_position(
-                    "005930",
+                    decision.get("symbol", "005930"),
                     "LONG",
-                    0,
+                    decision.get("price", 0),
                     1
                 )
                 action = "PAPER_BUY"
@@ -62,7 +62,7 @@ class ExecutionAI:
                     p["symbol"],
                     p["side"],
                     p["entry"],
-                    p["entry"],
+                    decision.get("price", p["entry"]),
                     p["qty"],
                     0,
                     "AI_EXIT"
@@ -79,8 +79,10 @@ class ExecutionAI:
             "signal": signal,
             "score": score,
             "action": action,
+            "symbol": decision.get("symbol", "005930"),
+            "price": decision.get("price", 0),
             "positions": len(portfolio.positions),
-            "history": len(history.get_all()),
+            "history": history.run().get("total_trades", 0),
             "updated_at": self.now()
         }
 

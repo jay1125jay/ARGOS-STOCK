@@ -9,6 +9,31 @@ class ChiefAI:
     def __init__(self):
         self.team = AITeam()
 
+    def pick_best_symbol(self, data):
+        technical = data.get("technical", {})
+        items = technical.get("items", [])
+
+        if not items:
+            return {
+                "symbol": "005930",
+                "price": 70000,
+                "symbol_score": 0,
+                "symbol_reason": "NO_TECHNICAL_ITEMS"
+            }
+
+        best = sorted(
+            items,
+            key=lambda x: x.get("score", 0),
+            reverse=True
+        )[0]
+
+        return {
+            "symbol": best.get("symbol", "005930"),
+            "price": best.get("best_price", best.get("price", 70000)),
+            "symbol_score": best.get("score", 0),
+            "symbol_reason": best.get("reason", "")
+        }
+
     def decide(self):
         data = self.team.run()
 
@@ -35,6 +60,8 @@ class ChiefAI:
 
         avg_score = round(sum(scores) / len(scores), 2) if scores else 0
 
+        picked = self.pick_best_symbol(data)
+
         if buy >= 3 and buy > sell:
             final = "BUY"
             reason = "BUY_VOTES_DOMINANT"
@@ -54,10 +81,14 @@ class ChiefAI:
             "auto_real_order": False,
             "signal": final,
             "score": avg_score,
+            "symbol": picked["symbol"],
+            "price": picked["price"],
+            "symbol_score": picked["symbol_score"],
             "buy_votes": buy,
             "sell_votes": sell,
             "wait_votes": wait,
             "reason": reason,
+            "symbol_reason": picked["symbol_reason"],
             "modules": data,
             "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }

@@ -25,7 +25,7 @@ class DataHub:
         "portfolio_positions": "data/portfolio/positions.json",
         "history": "data/history/trade_history.json",
         "report": "data/report/report_status.json",
-        "runner": "data/runner/runner_status.json",
+        "runner": "data/runner/auto_runner_status.json",
         "health": "data/system/health_status.json"
     }
 

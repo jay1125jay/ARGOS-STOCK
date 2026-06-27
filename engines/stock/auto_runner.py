@@ -21,6 +21,11 @@ from engines.stock.report_ai import ReportAI
 from engines.stock.learning_ai import run as run_learning
 from engines.stock.core.process_lock import ProcessLock
 from engines.stock.core.safe_json import SafeJSON
+from engines.stock.portfolio_manager import PortfolioManager
+from engines.stock.position_manager import PositionManager
+from engines.stock.pnl_engine import PnLEngine
+from engines.stock.history_engine import HistoryEngine
+from engines.stock.learning_engine import LearningEngine
 
 ROOT = r"C:\ARGOS_STOCK"
 
@@ -84,9 +89,29 @@ class AutoRunner:
         chief = step("CHIEF", lambda: ChiefAI().decide())
         decision = step("DECISION", lambda: DecisionCenter().evaluate(chief))
         execution = step("EXECUTION", lambda: ExecutionAI().run())
+        symbol = decision.get("symbol", "005930")
+        price = decision.get("price", 70000)
+        signal = decision.get("signal", "WAIT")
+
+        pm = PortfolioManager()
+
+        if signal == "BUY":
+            pm.buy(symbol, price, 10)
+
+        elif signal == "SELL":
+            pm.sell(symbol, price)
+
+        position = PositionManager().check({
+            symbol: price
+        })
+        pnl = PnLEngine().run()
+        history = HistoryEngine().run()
+
+        learning_engine = LearningEngine().run()
+
         report = step("REPORT", lambda: ReportAI().run())
         learning = step("LEARNING", run_learning)
-
+        
         status = {
             "project": "ARGOS_STOCK",
             "engine": "auto_runner",
@@ -94,10 +119,16 @@ class AutoRunner:
             "running": True,
             "loop_count": loop_count,
             "final_signal": decision.get("signal", "WAIT"),
+            "symbol": symbol,
+            "price": price,
             "decision_score": decision.get("score", 0),
             "execution_action": execution.get("action", "NO_ACTION"),
-            "positions": execution.get("positions", 0),
-            "history": execution.get("history", 0),
+            "positions": position.get("positions", 0),
+            "history": history.get("total_trades", 0),
+            "portfolio": position,
+            "pnl": pnl,
+            "history_engine": history,
+            "learning": learning_engine,
             "report_signal": report.get("final_signal", "WAIT"),
             "report_score": report.get("total_score", 0),
             "steps": steps,
@@ -116,6 +147,8 @@ class AutoRunner:
         print("REPORT :", status["report_signal"], status["report_score"])
         print("POSITION :", status["positions"])
         print("HISTORY :", status["history"])
+        print("WINRATE :", pnl["win_rate"])
+        print("TOTAL PNL :", pnl["total_pnl"])
 
         return status
 
@@ -140,17 +173,28 @@ class AutoRunner:
                 time.sleep(SLEEP_SECONDS)
 
         finally:
+
             lock.release()
 
-            final_status = {
-                "project": "ARGOS_STOCK",
-                "engine": "auto_runner",
-                "mode": "PAPER_ONLY",
-                "running": False,
-                "stopped_at": self.now()
-            }
+            try:
 
-            self.save_status(final_status)
+                status = SafeJSON.load(STATUS, {})
+
+                status["running"] = False
+                status["stopped_at"] = self.now()
+
+                self.save_status(status)
+
+            except Exception:
+
+                self.save_status({
+                    "project": "ARGOS_STOCK",
+                    "engine": "auto_runner",
+                    "mode": "PAPER_ONLY",
+                    "running": False,
+                    "stopped_at": self.now()
+                })
+
             print("AUTO_RUNNER_STOPPED")
 
 

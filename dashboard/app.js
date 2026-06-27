@@ -20,29 +20,41 @@ async function loadDashboard() {
     const account = await get("/account");
     const execution = await get("/execution");
     const system = await get("/system");
+    const runner = await get("/runner");
+    const technical = await get("/technical");
 
     document.getElementById("apiStatus").textContent = "API ONLINE";
     document.getElementById("apiStatus").className = "good";
 
-    const finalSignal = report.final_signal || decision.signal || "-";
+    document.getElementById("runnerStatus").textContent = runner.running ? "RUNNING" : "STOP";
+    document.getElementById("loopCount").textContent = runner.loop_count ?? "-";
+    document.getElementById("historyCount").textContent = runner.history ?? "-";
+    document.getElementById("winRate").textContent = runner.pnl?.win_rate ?? "-";
+
+    const finalSignal = runner.final_signal || report.final_signal || decision.signal || "-";
+    document.getElementById("selectedSymbol").textContent = runner.symbol ?? "-";
+    document.getElementById("selectedPrice").textContent = runner.price ?? "-";
     document.getElementById("finalSignal").textContent = finalSignal;
     document.getElementById("finalSignal").className = "signal " + clsSignal(finalSignal);
 
-    document.getElementById("totalScore").textContent = report.total_score ?? "-";
-    document.getElementById("mode").textContent = report.mode || decision.mode || "-";
+    document.getElementById("totalScore").textContent = runner.decision_score ?? report.total_score ?? "-";
+    document.getElementById("mode").textContent = runner.mode || report.mode || decision.mode || "-";
 
     document.getElementById("health").textContent = (health.health ?? 0) + "%";
     document.getElementById("health").className = "health " + (health.health >= 90 ? "good" : "bad");
     document.getElementById("okCount").textContent = health.ok ?? "-";
     document.getElementById("totalCount").textContent = health.total ?? "-";
 
-    document.getElementById("cash").textContent = account.cash ?? "-";
-    document.getElementById("equity").textContent = account.equity ?? "-";
-    document.getElementById("pnl").textContent = account.total_pnl ?? "-";
+    document.getElementById("cash").textContent = runner.pnl?.cash ?? account.cash ?? "-";
+    document.getElementById("equity").textContent = runner.pnl?.equity ?? account.equity ?? "-";
+    document.getElementById("pnl").textContent = runner.pnl?.total_pnl ?? account.total_pnl ?? "-";
 
     document.getElementById("execSignal").textContent = execution.signal ?? "-";
-    document.getElementById("execAction").textContent = execution.action ?? "-";
-    document.getElementById("execPositions").textContent = execution.positions ?? "-";
+    document.getElementById("execAction").textContent = runner.execution_action ?? execution.action ?? "-";
+    document.getElementById("execPositions").textContent = runner.positions ?? execution.positions ?? "-";
+
+    document.getElementById("selectedSymbol").textContent = runner.symbol ?? "-";
+    document.getElementById("selectedPrice").textContent = runner.price ?? "-";
 
     const aiBox = document.getElementById("aiStatus");
     aiBox.innerHTML = "";
@@ -64,13 +76,46 @@ async function loadDashboard() {
       modBox.appendChild(div);
     });
 
+    const top20 = document.getElementById("top20");
+    top20.innerHTML = "";
+
+    (technical.top20 || []).forEach((x, i) => {
+        const div = document.createElement("div");
+
+        div.className = "item";
+
+        div.innerHTML =
+            "<b>" +
+            (i + 1) +
+            ". " +
+            x.symbol +
+            "</b><br>" +
+            x.signal +
+            " | Score : " +
+            x.score +
+            "<br>₩ " +
+            Number(x.price).toLocaleString();
+
+        top20.appendChild(div);
+    });
+
     document.getElementById("systemBox").textContent = JSON.stringify({
+      runner,
       decision,
       execution,
-      runner: system.runner,
       market: system.market,
       macro: system.macro
     }, null, 2);
+
+    document.getElementById("btnStart").onclick = async () => {
+      await fetch(API + "/start", { method: "POST" });
+      loadDashboard();
+    };
+
+    document.getElementById("btnStop").onclick = async () => {
+      await fetch(API + "/stop", { method: "POST" });
+      loadDashboard();
+    };
 
   } catch (e) {
     document.getElementById("apiStatus").textContent = "API OFFLINE";

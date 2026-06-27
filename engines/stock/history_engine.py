@@ -4,80 +4,49 @@ from datetime import datetime
 
 ROOT = r"C:\ARGOS_STOCK"
 
-HISTORY = os.path.join(ROOT, "data", "history", "trade_history.json")
-
-
-def ensure():
-    os.makedirs(os.path.dirname(HISTORY), exist_ok=True)
+HISTORY = os.path.join(ROOT, "data", "portfolio", "history.json")
 
 
 def load():
     if not os.path.exists(HISTORY):
         return []
 
-    try:
-        with open(HISTORY, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except:
-        return []
-
-
-def save(data):
-    with open(HISTORY, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+    with open(HISTORY, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 class HistoryEngine:
 
-    def __init__(self):
-        ensure()
-        self.history = load()
+    def run(self):
 
-    def add_trade(
-        self,
-        symbol,
-        side,
-        entry,
-        exit_price,
-        qty,
-        pnl,
-        reason
-    ):
+        history = load()
 
-        self.history.append({
+        total = len(history)
 
-            "symbol": symbol,
-            "side": side,
+        win = sum(1 for x in history if x.get("pnl", 0) >= 0)
+        loss = total - win
 
-            "entry": entry,
-            "exit": exit_price,
+        total_pnl = sum(x.get("pnl", 0) for x in history)
 
-            "qty": qty,
+        avg = round(total_pnl / total, 2) if total else 0
 
-            "pnl": pnl,
+        last = history[-1] if total else {}
 
-            "reason": reason,
-
-            "closed_at":
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        })
-
-        save(self.history)
-
-    def get_all(self):
-        return self.history
-
-    def clear(self):
-        self.history = []
-        save(self.history)
+        return {
+            "engine": "history_engine",
+            "status": "READY",
+            "total_trades": total,
+            "wins": win,
+            "losses": loss,
+            "total_pnl": total_pnl,
+            "average_pnl": avg,
+            "last_trade": last,
+            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
 
 
 if __name__ == "__main__":
 
-    h = HistoryEngine()
+    import pprint
 
-    print("=" * 60)
-    print("HISTORY ENGINE")
-    print("TRADES :", len(h.get_all()))
-    print("READY")
+    pprint.pp(HistoryEngine().run())
