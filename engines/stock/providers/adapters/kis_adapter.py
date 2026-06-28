@@ -11,7 +11,7 @@ ROOT = r"C:\ARGOS_STOCK"
 KIS_CONFIG = os.path.join(ROOT, "config", "kis_config.json")
 KIS_SECRET = os.path.join(ROOT, "config", "kis_secret.json")
 STOCK_SETTINGS = os.path.join(ROOT, "config", "stock", "stock_settings.json")
-KIS_CACHE = os.path.join(ROOT, "data", "stock", "kis_cache.json")
+KIS_CACHE = os.path.join(ROOT, "data", "stock", "kis_accum_cache.json")
 KIS_TOKEN = os.path.join(ROOT, "data", "stock", "kis_token.json")
 KIS_CURSOR = os.path.join(ROOT, "data", "stock", "kis_cursor.json")
 KIS_ACCUM = os.path.join(ROOT, "data", "stock", "kis_accum_cache.json")
@@ -254,7 +254,8 @@ class KISAdapter:
                     quote_map[q.get("symbol", "")] = q
 
                 for q in quotes:
-                    quote_map[q.get("symbol", "")] = q
+                    if q.get("status") == "QUOTE_OK" and float(q.get("price", 0) or 0) > 0:
+                        quote_map[q.get("symbol", "")] = q
 
                 accum_quotes = list(quote_map.values())
 

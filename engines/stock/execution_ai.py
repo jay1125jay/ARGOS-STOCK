@@ -4,6 +4,7 @@ from datetime import datetime
 
 from engines.stock.portfolio_engine import PortfolioEngine
 from engines.stock.history_engine import HistoryEngine
+from engines.stock.trade_history_engine import TradeHistoryEngine
 
 ROOT = r"C:\ARGOS_STOCK"
 
@@ -34,37 +35,40 @@ class ExecutionAI:
 
         portfolio = PortfolioEngine()
         history = HistoryEngine()
+        trade_history = TradeHistoryEngine()
 
         decision = self.load(DECISION, {})
 
         signal = decision.get("signal", "WAIT")
         score = decision.get("score", 0)
 
+        symbol = decision.get("symbol", "")
+        price = float(decision.get("price", 0) or 0)
+
         action = "NO_ACTION"
 
-        if signal == "BUY":
+        if signal == "BUY" and symbol and price > 0:
             if len(portfolio.positions) == 0:
                 portfolio.add_position(
-                    decision.get("symbol", "005930"),
+                    symbol,
                     "LONG",
-                    decision.get("price", 0),
+                    price,
                     1
                 )
                 action = "PAPER_BUY"
 
-        elif signal == "SELL":
+        elif signal == "SELL" and symbol and price > 0:
 
             if len(portfolio.positions) > 0:
 
                 p = portfolio.positions[0]
 
-                history.add_trade(
+                trade_history.add_trade(
                     p["symbol"],
                     p["side"],
                     p["entry"],
-                    decision.get("price", p["entry"]),
+                    price,
                     p["qty"],
-                    0,
                     "AI_EXIT"
                 )
 
@@ -79,10 +83,10 @@ class ExecutionAI:
             "signal": signal,
             "score": score,
             "action": action,
-            "symbol": decision.get("symbol", "005930"),
-            "price": decision.get("price", 0),
+            "symbol": symbol,
+            "price": price,
             "positions": len(portfolio.positions),
-            "history": history.run().get("total_trades", 0),
+            "history": trade_history.run().get("total_trades", 0),
             "updated_at": self.now()
         }
 

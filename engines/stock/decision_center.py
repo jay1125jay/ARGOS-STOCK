@@ -56,9 +56,7 @@ class DecisionCenter:
         return points, reasons
 
     def evaluate(self, ai=None):
-        modules = {}
-        if ai:
-            modules = ai.get("modules", {})
+        modules = ai.get("modules", {}) if ai else {}
 
         total_score = 0
         reasons = []
@@ -94,8 +92,11 @@ class DecisionCenter:
             "api_order": False,
             "auto_real_order": False,
             "signal": signal,
-            "symbol": ai.get("symbol", "005930") if ai else "005930",
-            "price": ai.get("price", 70000) if ai else 70000,
+            "score": round(total_score, 2),
+            "symbol": ai.get("symbol", "") if ai else "",
+            "price": ai.get("price", 0) if ai else 0,
+            "symbol_score": ai.get("symbol_score", 0) if ai else 0,
+            "symbol_reason": ai.get("symbol_reason", "") if ai else "",
             "approved": signal in ["BUY", "SELL"],
             "chief_signal": chief_signal,
             "reason": ",".join(reasons),

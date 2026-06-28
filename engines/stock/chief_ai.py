@@ -1,10 +1,22 @@
+import os
+
 import json
 from datetime import datetime
 
 from engines.stock.ai_team import AITeam
 
+ROOT = r"C:\ARGOS_STOCK"
+RANKING = os.path.join(ROOT, "data", "ranking", "ranking_status.json")
+
 
 class ChiefAI:
+
+    def load_ranking(self):
+        if not os.path.exists(RANKING):
+            return {}
+
+        with open(RANKING, "r", encoding="utf-8") as f:
+            return json.load(f)
 
     def __init__(self):
         self.team = AITeam()
@@ -61,6 +73,17 @@ class ChiefAI:
         avg_score = round(sum(scores) / len(scores), 2) if scores else 0
 
         picked = self.pick_best_symbol(data)
+
+        ranking = self.load_ranking()
+        rank_best = ranking.get("best", {})
+
+        if rank_best:
+            picked = {
+                "symbol": rank_best.get("symbol", picked["symbol"]),
+                "price": rank_best.get("price", picked["price"]),
+                "symbol_score": rank_best.get("score", picked["symbol_score"]),
+                "symbol_reason": rank_best.get("reason", picked["symbol_reason"])
+            }
 
         if buy >= 3 and buy > sell:
             final = "BUY"
