@@ -2,6 +2,7 @@ import json
 import os
 import time
 from datetime import datetime
+from engines.stock.universe_engine import UniverseEngine
 
 import requests
 
@@ -12,6 +13,9 @@ KIS_SECRET = os.path.join(ROOT, "config", "kis_secret.json")
 STOCK_SETTINGS = os.path.join(ROOT, "config", "stock", "stock_settings.json")
 KIS_CACHE = os.path.join(ROOT, "data", "stock", "kis_cache.json")
 KIS_TOKEN = os.path.join(ROOT, "data", "stock", "kis_token.json")
+KIS_CURSOR = os.path.join(ROOT, "data", "stock", "kis_cursor.json")
+KIS_ACCUM = os.path.join(ROOT, "data", "stock", "kis_accum_cache.json")
+BATCH_SIZE = 10
 
 
 class KISAdapter:
@@ -181,7 +185,6 @@ class KISAdapter:
                 "ask": float(output.get("askp", 0) or 0),
                 "source": "KIS_REAL",
                 "status": "QUOTE_OK",
-                "raw": output,
                 "updated_at": self.now()
             }
 
@@ -195,11 +198,27 @@ class KISAdapter:
             }
 
     def collect_watchlist(self):
-        watchlist = self.settings.get("kr_watchlist", [])
+        watchlist = UniverseEngine().get_symbols()
         quotes = []
 
+        cursor_data = self.load_json(KIS_CURSOR, {"index": 0})
+        start = int(cursor_data.get("index", 0))
+        end = start + BATCH_SIZE
+
+        batch = watchlist[start:end]
+
+        if not batch:
+            start = 0
+            end = BATCH_SIZE
+            batch = watchlist[start:end]
+
+        next_index = end
+
+        if next_index >= len(watchlist):
+            next_index = 0
+        
         if not self.has_keys():
-            for symbol in watchlist:
+            for symbol in batch:
                 quotes.append(self.mock_quote(symbol))
 
             status = "MOCK_READY"
@@ -210,7 +229,7 @@ class KISAdapter:
             token = self.get_token()
 
             if not token:
-                for symbol in watchlist:
+                for symbol in batch:
                     quotes.append(self.mock_quote(symbol))
 
                 status = "TOKEN_FAIL_FALLBACK_MOCK"
@@ -218,13 +237,26 @@ class KISAdapter:
                 mock_mode = True
 
             else:
-                for symbol in watchlist:
+                for symbol in batch:
                     quotes.append(self.get_domestic_quote(token, symbol))
                     time.sleep(1.1)
 
                 status = "REAL_READY"
                 connected = True
                 mock_mode = False
+
+                accum = self.load_json(KIS_ACCUM, {"quotes": []})
+                old_quotes = accum.get("quotes", [])
+
+                quote_map = {}
+
+                for q in old_quotes:
+                    quote_map[q.get("symbol", "")] = q
+
+                for q in quotes:
+                    quote_map[q.get("symbol", "")] = q
+
+                accum_quotes = list(quote_map.values())
 
         payload = {
             "project": "ARGOS_STOCK",
@@ -238,9 +270,30 @@ class KISAdapter:
             "status": status,
             "market": "KOREA",
             "symbols": watchlist,
-            "quotes": quotes,
+            "batch": batch,
+            "batch_start": start,
+            "batch_end": end,
+            "next_index": next_index,
+            "quotes": accum_quotes,
+            "batch_quotes": quotes,
             "updated_at": self.now()
         }
+
+        self.save_json(KIS_CURSOR, {
+            "index": next_index,
+            "batch_size": BATCH_SIZE,
+            "total": len(watchlist),
+            "updated_at": self.now()
+        })
+
+        self.save_json(KIS_ACCUM, {
+            "project": "ARGOS_STOCK",
+            "provider": "KIS",
+            "total": len(watchlist),
+            "count": len(accum_quotes),
+            "quotes": accum_quotes,
+            "updated_at": self.now()
+        })
 
         self.save_json(KIS_CACHE, payload)
         return payload
