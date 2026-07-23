@@ -1,66 +1,170 @@
-import json
+﻿import json
 import os
 from datetime import datetime
 
+from engines.argos_config import START_BALANCE
+
+
 ROOT = r"C:\ARGOS_STOCK"
 
-ACCOUNT = os.path.join(ROOT, "data", "portfolio", "account.json")
-POSITIONS = os.path.join(ROOT, "data", "portfolio", "positions.json")
-PERFORMANCE = os.path.join(ROOT, "data", "portfolio", "performance.json")
+ACCOUNT = os.path.join(
+    ROOT,
+    "data",
+    "portfolio",
+    "account.json",
+)
+
+POSITIONS = os.path.join(
+    ROOT,
+    "data",
+    "portfolio",
+    "positions.json",
+)
+
+PERFORMANCE = os.path.join(
+    ROOT,
+    "data",
+    "portfolio",
+    "performance.json",
+)
 
 
-def ensure():
-    os.makedirs(os.path.dirname(ACCOUNT), exist_ok=True)
+# 留ㅻℓ 鍮꾩슜 ?ㅼ젙
+BROKER_FEE_RATE = 0.00015
+SELL_TAX_RATE = 0.0015
+SLIPPAGE_RATE = 0.0
 
 
-def load(path, default):
+def now():
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+def load_json(path, default):
     if not os.path.exists(path):
         return default
+
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
+        with open(path, "r", encoding="utf-8-sig") as file:
+            return json.load(file)
     except Exception:
         return default
 
 
-def save(path, data):
+def save_json(path, data):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+
+    temp_path = f"{path}.tmp"
+
+    with open(temp_path, "w", encoding="utf-8") as file:
+        json.dump(
+            data,
+            file,
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    os.replace(temp_path, path)
 
 
 class PortfolioEngine:
 
     def __init__(self):
-        ensure()
+        self.account = load_json(
+            ACCOUNT,
+            self.default_account(),
+        )
 
-        self.account = load(ACCOUNT, {
-            "cash": 10000000,
-            "equity": 10000000,
-            "today_pnl": 0,
-            "total_pnl": 0,
-            "win_rate": 0,
+        self.positions = load_json(
+            POSITIONS,
+            [],
+        )
+
+        self.performance = load_json(
+            PERFORMANCE,
+            self.default_performance(),
+        )
+
+        if not isinstance(self.account, dict):
+            self.account = self.default_account()
+
+        if not isinstance(self.positions, list):
+            self.positions = []
+
+        if not isinstance(self.performance, dict):
+            self.performance = self.default_performance()
+
+        self.normalize()
+
+    def default_account(self):
+        return {
+            "initial_cash": float(START_BALANCE),
+            "cash": float(START_BALANCE),
+            "equity": float(START_BALANCE),
+            "today_pnl": 0.0,
+            "total_pnl": 0.0,
+            "win": 0,
+            "loss": 0,
+            "win_rate": 0.0,
             "trade_count": 0,
-            "updated_at": ""
-        })
+            "total_buy_fee": 0.0,
+            "total_sell_fee": 0.0,
+            "total_tax": 0.0,
+            "total_cost": 0.0,
+            "updated_at": "",
+        }
 
-        self.positions = load(POSITIONS, [])
+    def default_performance(self):
+        return {
+            "today": 0.0,
+            "week": 0.0,
+            "month": 0.0,
+            "total": 0.0,
+            "win": 0,
+            "loss": 0,
+            "trade_count": 0,
+            "win_rate": 0.0,
+            "updated_at": "",
+        }
 
-        self.performance = load(PERFORMANCE, {
-            "today": 0,
-            "week": 0,
-            "month": 0,
-            "total": 0
-        })
+    def normalize(self):
+        account_defaults = self.default_account()
 
-    def now(self):
-        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for key, value in account_defaults.items():
+            if key not in self.account:
+                self.account[key] = value
+
+        performance_defaults = self.default_performance()
+
+        for key, value in performance_defaults.items():
+            if key not in self.performance:
+                self.performance[key] = value
+
+        self.update_win_rate()
+        self.update_equity()
 
     def save_all(self):
-        self.account["updated_at"] = self.now()
-        save(ACCOUNT, self.account)
-        save(POSITIONS, self.positions)
-        save(PERFORMANCE, self.performance)
+        self.update_win_rate()
+        self.update_equity()
+
+        updated_at = now()
+
+        self.account["updated_at"] = updated_at
+        self.performance["updated_at"] = updated_at
+
+        save_json(
+            ACCOUNT,
+            self.account,
+        )
+
+        save_json(
+            POSITIONS,
+            self.positions,
+        )
+
+        save_json(
+            PERFORMANCE,
+            self.performance,
+        )
 
     def get_account(self):
         return self.account
@@ -68,77 +172,515 @@ class PortfolioEngine:
     def get_positions(self):
         return self.positions
 
-    def has_position(self):
-        return len(self.positions) > 0
+    def has_position(self, symbol=None):
+        if symbol is None:
+            return len(self.positions) > 0
 
-    def add_position(self, symbol, side, price, qty, reason="PAPER_ENTRY"):
-        cost = price * qty
+        return any(
+            position.get("symbol") == symbol
+            for position in self.positions
+        )
 
-        if side == "BUY" and self.account.get("cash", 0) < cost:
+    def find_position(self, symbol):
+        for position in self.positions:
+            if position.get("symbol") == symbol:
+                return position
+
+        return None
+
+    def update_win_rate(self):
+        trade_count = int(
+            self.account.get("trade_count", 0)
+            or 0
+        )
+
+        win = int(
+            self.account.get("win", 0)
+            or 0
+        )
+
+        if trade_count > 0:
+            win_rate = round(
+                win / trade_count * 100,
+                2,
+            )
+        else:
+            win_rate = 0.0
+
+        self.account["win_rate"] = win_rate
+
+    def update_equity(self):
+        cash = float(
+            self.account.get("cash", 0)
+            or 0
+        )
+
+        position_value = 0.0
+
+        for position in self.positions:
+            price = float(
+                position.get(
+                    "current_price",
+                    position.get("entry", 0),
+                )
+                or 0
+            )
+
+            qty = float(
+                position.get("qty", 0)
+                or 0
+            )
+
+            position_value += price * qty
+
+        self.account["equity"] = round(
+            cash + position_value,
+            2,
+        )
+
+    def add_position(
+        self,
+        symbol,
+        side,
+        price,
+        qty,
+        reason="PAPER_ENTRY",
+    ):
+        symbol = str(symbol)
+        side = str(side).upper()
+
+        price = float(price or 0)
+        qty = float(qty or 0)
+
+        if not symbol:
             return False
 
-        if side == "BUY":
-            self.account["cash"] = round(self.account.get("cash", 0) - cost, 2)
+        if side not in ("BUY", "LONG"):
+            return False
+
+        if price <= 0 or qty <= 0:
+            return False
+
+        if self.has_position(symbol):
+            return False
+
+        entry_price = round(
+            price * (1 + SLIPPAGE_RATE),
+            6,
+        )
+
+        gross_cost = round(
+            entry_price * qty,
+            2,
+        )
+
+        buy_fee = round(
+            gross_cost * BROKER_FEE_RATE,
+            2,
+        )
+
+        entry_cost = round(
+            gross_cost + buy_fee,
+            2,
+        )
+
+        cash = float(
+            self.account.get("cash", 0)
+            or 0
+        )
+
+        if cash < entry_cost:
+            return False
+
+        self.account["cash"] = round(
+            cash - entry_cost,
+            2,
+        )
+
+        self.account["total_buy_fee"] = round(
+            float(
+                self.account.get(
+                    "total_buy_fee",
+                    0,
+                )
+                or 0
+            )
+            + buy_fee,
+            2,
+        )
+
+        self.account["total_cost"] = round(
+            float(
+                self.account.get(
+                    "total_cost",
+                    0,
+                )
+                or 0
+            )
+            + buy_fee,
+            2,
+        )
 
         self.positions.append({
             "symbol": symbol,
-            "side": side,
-            "entry": price,
+            "side": "BUY",
+            "entry": entry_price,
+            "entry_price": entry_price,
+            "current_price": entry_price,
             "qty": qty,
-            "cost": round(cost, 2),
-            "tp": round(price * 1.02, 2),
-            "sl": round(price * 0.99, 2),
+            "gross_cost": gross_cost,
+            "cost": gross_cost,
+            "buy_fee": buy_fee,
+            "entry_cost": entry_cost,
+            "tp": round(
+                entry_price * 1.02,
+                2,
+            ),
+            "sl": round(
+                entry_price * 0.99,
+                2,
+            ),
+            "highest_price": entry_price,
+            "status": "OPEN",
             "reason": reason,
-            "opened_at": self.now()
+            "opened_at": now(),
         })
 
         self.save_all()
+
         return True
 
-    def close_position(self, position, exit_price, reason="PAPER_EXIT"):
-        side = position.get("side", "BUY")
-        entry = float(position.get("entry", 0))
-        qty = float(position.get("qty", 0))
+    def close_position(
+        self,
+        position,
+        exit_price,
+        reason="PAPER_EXIT",
+    ):
+        if not isinstance(position, dict):
+            return None
 
-        if side == "BUY":
-            gross = exit_price * qty
-            pnl = (exit_price - entry) * qty
-            self.account["cash"] = round(self.account.get("cash", 0) + gross, 2)
-        else:
-            gross = 0
-            pnl = 0
+        symbol = position.get("symbol")
+        opened_at = position.get("opened_at")
 
-        self.account["total_pnl"] = round(self.account.get("total_pnl", 0) + pnl, 2)
-        self.account["today_pnl"] = round(self.account.get("today_pnl", 0) + pnl, 2)
-        self.account["trade_count"] = int(self.account.get("trade_count", 0)) + 1
+        stored_position = next(
+            (
+                item
+                for item in self.positions
+                if item.get("symbol") == symbol
+                and item.get("opened_at") == opened_at
+            ),
+            None,
+        )
+
+        if stored_position is None:
+            return None
+
+        entry_price = float(
+            stored_position.get(
+                "entry",
+                stored_position.get(
+                    "entry_price",
+                    0,
+                ),
+            )
+            or 0
+        )
+
+        qty = float(
+            stored_position.get("qty", 0)
+            or 0
+        )
+
+        exit_price = float(exit_price or 0)
+
+        if entry_price <= 0:
+            return None
+
+        if exit_price <= 0:
+            return None
+
+        if qty <= 0:
+            return None
+
+        executed_exit = round(
+            exit_price * (1 - SLIPPAGE_RATE),
+            6,
+        )
+
+        gross_proceeds = round(
+            executed_exit * qty,
+            2,
+        )
+
+        gross_cost = float(
+            stored_position.get(
+                "gross_cost",
+                entry_price * qty,
+            )
+            or 0
+        )
+
+        buy_fee = float(
+            stored_position.get(
+                "buy_fee",
+                0,
+            )
+            or 0
+        )
+
+        sell_fee = round(
+            gross_proceeds * BROKER_FEE_RATE,
+            2,
+        )
+
+        tax = round(
+            gross_proceeds * SELL_TAX_RATE,
+            2,
+        )
+
+        net_proceeds = round(
+            gross_proceeds
+            - sell_fee
+            - tax,
+            2,
+        )
+
+        pnl = round(
+            net_proceeds
+            - gross_cost
+            - buy_fee,
+            2,
+        )
+
+        self.account["cash"] = round(
+            float(
+                self.account.get("cash", 0)
+                or 0
+            )
+            + net_proceeds,
+            2,
+        )
+
+        self.account["today_pnl"] = round(
+            float(
+                self.account.get(
+                    "today_pnl",
+                    0,
+                )
+                or 0
+            )
+            + pnl,
+            2,
+        )
+
+        self.account["total_pnl"] = round(
+            float(
+                self.account.get(
+                    "total_pnl",
+                    0,
+                )
+                or 0
+            )
+            + pnl,
+            2,
+        )
+
+        self.account["trade_count"] = (
+            int(
+                self.account.get(
+                    "trade_count",
+                    0,
+                )
+                or 0
+            )
+            + 1
+        )
+
+        if pnl > 0:
+            self.account["win"] = (
+                int(
+                    self.account.get("win", 0)
+                    or 0
+                )
+                + 1
+            )
+
+        elif pnl < 0:
+            self.account["loss"] = (
+                int(
+                    self.account.get("loss", 0)
+                    or 0
+                )
+                + 1
+            )
+
+        self.account["total_sell_fee"] = round(
+            float(
+                self.account.get(
+                    "total_sell_fee",
+                    0,
+                )
+                or 0
+            )
+            + sell_fee,
+            2,
+        )
+
+        self.account["total_tax"] = round(
+            float(
+                self.account.get(
+                    "total_tax",
+                    0,
+                )
+                or 0
+            )
+            + tax,
+            2,
+        )
+
+        self.account["total_cost"] = round(
+            float(
+                self.account.get(
+                    "total_cost",
+                    0,
+                )
+                or 0
+            )
+            + sell_fee
+            + tax,
+            2,
+        )
+
+        self.performance["today"] = round(
+            float(
+                self.performance.get("today", 0)
+                or 0
+            )
+            + pnl,
+            2,
+        )
+
+        self.performance["week"] = round(
+            float(
+                self.performance.get("week", 0)
+                or 0
+            )
+            + pnl,
+            2,
+        )
+
+        self.performance["month"] = round(
+            float(
+                self.performance.get("month", 0)
+                or 0
+            )
+            + pnl,
+            2,
+        )
+
+        self.performance["total"] = round(
+            float(
+                self.performance.get("total", 0)
+                or 0
+            )
+            + pnl,
+            2,
+        )
 
         self.positions = [
-            p for p in self.positions
+            item
+            for item in self.positions
             if not (
-                p.get("symbol") == position.get("symbol")
-                and p.get("opened_at") == position.get("opened_at")
+                item.get("symbol") == symbol
+                and item.get("opened_at")
+                == opened_at
             )
         ]
+
+        self.update_win_rate()
+
+        self.performance["trade_count"] = (
+            self.account["trade_count"]
+        )
+
+        self.performance["win"] = (
+            self.account["win"]
+        )
+
+        self.performance["loss"] = (
+            self.account["loss"]
+        )
+
+        self.performance["win_rate"] = (
+            self.account["win_rate"]
+        )
+
+        trade = {
+            "symbol": symbol,
+            "side": "SELL",
+            "entry": entry_price,
+            "exit": executed_exit,
+            "qty": qty,
+            "gross_pnl": round(
+                (executed_exit - entry_price) * qty,
+                2,
+            ),
+            "buy_fee": round(
+                buy_fee,
+                2,
+            ),
+            "sell_fee": round(
+                sell_fee,
+                2,
+            ),
+            "tax": round(
+                tax,
+                2,
+            ),
+            "total_cost": round(
+                buy_fee + sell_fee + tax,
+                2,
+            ),
+            "pnl": pnl,
+            "reason": reason,
+            "opened_at": opened_at,
+            "closed_at": now(),
+        }
+
+        self.save_all()
+
+        return trade
+
+    def close_all(self):
+        return False
+
+    def reset(self):
+        self.account = self.default_account()
+        self.positions = []
+        self.performance = self.default_performance()
 
         self.save_all()
 
         return {
-            "symbol": position.get("symbol", ""),
-            "side": side,
-            "entry": entry,
-            "exit": exit_price,
-            "qty": qty,
-            "pnl": round(pnl, 2),
-            "reason": reason,
-            "closed_at": self.now()
+            "status": "RESET",
+            "cash": self.account["cash"],
+            "positions": 0,
         }
-
-    def close_all(self):
-        self.positions = []
-        self.save_all()
 
 
 if __name__ == "__main__":
-    p = PortfolioEngine()
-    p.save_all()
-    print("PORTFOLIO_ENGINE_READY")
+    portfolio = PortfolioEngine()
+    portfolio.save_all()
+
+    print(
+        json.dumps(
+            {
+                "engine": "portfolio_engine",
+                "status": "READY",
+                "account": portfolio.get_account(),
+                "positions": portfolio.get_positions(),
+            },
+            indent=2,
+            ensure_ascii=False,
+        )
+    )

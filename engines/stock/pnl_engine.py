@@ -4,8 +4,19 @@ from datetime import datetime
 
 ROOT = r"C:\ARGOS_STOCK"
 
-ACCOUNT = os.path.join(ROOT, "data", "portfolio", "account.json")
-TRADE_HISTORY = os.path.join(ROOT, "data", "trade", "trade_history.json")
+ACCOUNT = os.path.join(
+    ROOT,
+    "data",
+    "portfolio",
+    "account.json"
+)
+
+TRADE_HISTORY = os.path.join(
+    ROOT,
+    "data",
+    "trade",
+    "trade_history.json"
+)
 
 
 def load(path, default):
@@ -27,21 +38,95 @@ class PnLEngine:
     def run(self):
 
         account = load(ACCOUNT, {})
-        trade_data = load(TRADE_HISTORY, {"trades": []})
+        trade_data = load(
+            TRADE_HISTORY,
+            {"trades": []}
+        )
+
         trades_list = trade_data.get("trades", [])
 
-        total_pnl = round(sum(float(t.get("pnl", 0) or 0) for t in trades_list), 2)
-        win = len([t for t in trades_list if float(t.get("pnl", 0) or 0) > 0])
-        loss = len([t for t in trades_list if float(t.get("pnl", 0) or 0) < 0])
+        if not isinstance(trades_list, list):
+            trades_list = []
+
+        total_pnl = round(
+            sum(
+                float(
+                    trade.get("pnl", 0)
+                    or 0
+                )
+                for trade in trades_list
+            ),
+            2
+        )
+
+        win = len([
+            trade
+            for trade in trades_list
+            if float(
+                trade.get("pnl", 0)
+                or 0
+            ) > 0
+        ])
+
+        loss = len([
+            trade
+            for trade in trades_list
+            if float(
+                trade.get("pnl", 0)
+                or 0
+            ) < 0
+        ])
+
         trades = len(trades_list)
 
-        win_rate = 0
-        if trades > 0:
-            win_rate = round((win / trades) * 100, 2)
+        win_rate = 0.0
 
-        base_cash = float(account.get("initial_cash", 10000000) or 10000000)
-        cash = round(base_cash + total_pnl, 2)
-        equity = cash
+        if trades > 0:
+            win_rate = round(
+                win / trades * 100,
+                2
+            )
+
+        cash = round(
+            float(
+                account.get("cash", 0)
+                or 0
+            ),
+            2
+        )
+
+        equity = round(
+            float(
+                account.get(
+                    "equity",
+                    cash
+                )
+                or cash
+            ),
+            2
+        )
+
+        today_pnl = round(
+            float(
+                account.get(
+                    "today_pnl",
+                    total_pnl
+                )
+                or 0
+            ),
+            2
+        )
+
+        account_total_pnl = round(
+            float(
+                account.get(
+                    "total_pnl",
+                    total_pnl
+                )
+                or 0
+            ),
+            2
+        )
 
         return {
             "engine": "pnl_engine",
@@ -49,17 +134,42 @@ class PnLEngine:
             "mode": "PAPER_ONLY",
             "cash": cash,
             "equity": equity,
-            "today_pnl": total_pnl,
-            "total_pnl": total_pnl,
-            "win": win,
-            "loss": loss,
-            "trades": trades,
-            "win_rate": win_rate,
+            "today_pnl": today_pnl,
+            "total_pnl": account_total_pnl,
+            "win": int(
+                account.get("win", win)
+                or 0
+            ),
+            "loss": int(
+                account.get("loss", loss)
+                or 0
+            ),
+            "trades": int(
+                account.get(
+                    "trade_count",
+                    trades
+                )
+                or 0
+            ),
+            "win_rate": round(
+                float(
+                    account.get(
+                        "win_rate",
+                        win_rate
+                    )
+                    or 0
+                ),
+                2
+            ),
             "history_count": trades,
+            "history_total_pnl": total_pnl,
             "updated_at": self.now()
         }
 
 
 if __name__ == "__main__":
     import pprint
-    pprint.pp(PnLEngine().run())
+
+    pprint.pp(
+        PnLEngine().run()
+    )
