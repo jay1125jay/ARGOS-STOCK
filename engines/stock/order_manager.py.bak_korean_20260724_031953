@@ -1,0 +1,641 @@
+﻿from __future__ import annotations
+
+import copy
+import json
+import os
+import tempfile
+import threading
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+
+class OrderManager:
+    """
+    ARGOS_STOCK 二쇰Ц ?곹깭 愿由??붿쭊.
+
+    책임:
+    - 二쇰Ц ?앹꽦 諛?怨좎쑀 二쇰Ц踰덊샇 諛쒓툒
+    - 二쇰Ц ?곹깭 ?꾪솚 寃利?
+    - 泥닿껐 ?섎웾 愿由?
+    - orders.json ?먯옄?????
+    - ?꾨줈洹몃옩 ?ъ떆????二쇰Ц 蹂듭썝
+
+    ???붿쭊? PortfolioEngine??吏곸젒 ?몄텧?섏? ?딅뒗??
+    ?ㅼ젣 ?ы듃?대━??諛섏쁺? ExecutionAI媛 FILLED ?곹깭瑜??뺤씤?????섑뻾?쒕떎.
+    """
+
+    ENGINE_NAME = "order_manager"
+    MODE = "PAPER_ONLY"
+
+    STATUS_NEW = "NEW"
+    STATUS_ACCEPTED = "ACCEPTED"
+    STATUS_PARTIAL = "PARTIAL"
+    STATUS_FILLED = "FILLED"
+    STATUS_CANCELED = "CANCELED"
+    STATUS_REJECTED = "REJECTED"
+
+    VALID_STATUSES = {
+        STATUS_NEW,
+        STATUS_ACCEPTED,
+        STATUS_PARTIAL,
+        STATUS_FILLED,
+        STATUS_CANCELED,
+        STATUS_REJECTED,
+    }
+
+    FINAL_STATUSES = {
+        STATUS_FILLED,
+        STATUS_CANCELED,
+        STATUS_REJECTED,
+    }
+
+    VALID_SIDES = {"BUY", "SELL"}
+
+    ALLOWED_TRANSITIONS = {
+        STATUS_NEW: {
+            STATUS_ACCEPTED,
+            STATUS_CANCELED,
+            STATUS_REJECTED,
+        },
+        STATUS_ACCEPTED: {
+            STATUS_PARTIAL,
+            STATUS_FILLED,
+            STATUS_CANCELED,
+            STATUS_REJECTED,
+        },
+        STATUS_PARTIAL: {
+            STATUS_PARTIAL,
+            STATUS_FILLED,
+            STATUS_CANCELED,
+        },
+        STATUS_FILLED: set(),
+        STATUS_CANCELED: set(),
+        STATUS_REJECTED: set(),
+    }
+
+    def __init__(self, orders_path: Optional[str | Path] = None) -> None:
+        project_root = Path(__file__).resolve().parents[2]
+
+        self.orders_path = (
+            Path(orders_path)
+            if orders_path is not None
+            else project_root / "data" / "orders" / "orders.json"
+        )
+
+        self._lock = threading.RLock()
+        self._data = self._load_or_initialize()
+
+    @staticmethod
+    def _now() -> str:
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    def _empty_data(self) -> Dict[str, Any]:
+        return {
+            "engine": self.ENGINE_NAME,
+            "mode": self.MODE,
+            "orders": [],
+            "updated_at": self._now(),
+        }
+
+    def _load_or_initialize(self) -> Dict[str, Any]:
+        self.orders_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if not self.orders_path.exists():
+            data = self._empty_data()
+            self._atomic_write(data)
+            return data
+
+        with self.orders_path.open("r", encoding="utf-8-sig") as file:
+            data = json.load(file)
+
+        self._validate_storage(data)
+        return data
+
+    def _validate_storage(self, data: Dict[str, Any]) -> None:
+        if not isinstance(data, dict):
+            raise ValueError("orders.json 理쒖긽???곗씠?곕뒗 媛앹껜?ъ빞 ?⑸땲??")
+
+        orders = data.get("orders")
+
+        if not isinstance(orders, list):
+            raise ValueError("orders.json??orders??諛곗뿴?댁뼱???⑸땲??")
+
+        seen_order_ids = set()
+
+        for order in orders:
+            self._validate_loaded_order(order)
+
+            order_id = order["order_id"]
+
+            if order_id in seen_order_ids:
+                raise ValueError(f"以묐났 二쇰Ц踰덊샇媛 諛쒓껄?섏뿀?듬땲?? {order_id}")
+
+            seen_order_ids.add(order_id)
+
+    def _validate_loaded_order(self, order: Dict[str, Any]) -> None:
+        required_fields = {
+            "order_id",
+            "symbol",
+            "side",
+            "price",
+            "qty",
+            "filled_qty",
+            "remaining_qty",
+            "status",
+            "reason",
+            "created_at",
+            "updated_at",
+        }
+
+        if not isinstance(order, dict):
+            raise ValueError("orders 諛곗뿴??媛?二쇰Ц? 媛앹껜?ъ빞 ?⑸땲??")
+
+        missing_fields = required_fields - set(order.keys())
+
+        if missing_fields:
+            missing = ", ".join(sorted(missing_fields))
+            raise ValueError(f"二쇰Ц ?꾨뱶媛 ?꾨씫?섏뿀?듬땲?? {missing}")
+
+        if order["status"] not in self.VALID_STATUSES:
+            raise ValueError(
+                f"?좏슚?섏? ?딆? 二쇰Ц ?곹깭?낅땲?? {order['status']}"
+            )
+
+        if order["side"] not in self.VALID_SIDES:
+            raise ValueError(
+                f"?좏슚?섏? ?딆? 二쇰Ц 諛⑺뼢?낅땲?? {order['side']}"
+            )
+
+        qty = int(order["qty"])
+        filled_qty = int(order["filled_qty"])
+        remaining_qty = int(order["remaining_qty"])
+
+        if qty <= 0:
+            raise ValueError("二쇰Ц ?섎웾? 1 ?댁긽?댁뼱???⑸땲??")
+
+        if filled_qty < 0 or filled_qty > qty:
+            raise ValueError("泥닿껐 ?섎웾???좏슚?섏? ?딆뒿?덈떎.")
+
+        if remaining_qty != qty - filled_qty:
+            raise ValueError("?붿뿬 ?섎웾 怨꾩궛???쇱튂?섏? ?딆뒿?덈떎.")
+
+    def _atomic_write(self, data: Dict[str, Any]) -> None:
+        self.orders_path.parent.mkdir(parents=True, exist_ok=True)
+
+        temporary_path: Optional[Path] = None
+
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=str(self.orders_path.parent),
+                prefix="orders_",
+                suffix=".tmp",
+                delete=False,
+            ) as temporary_file:
+                temporary_path = Path(temporary_file.name)
+
+                json.dump(
+                    data,
+                    temporary_file,
+                    ensure_ascii=False,
+                    indent=2,
+                )
+
+                temporary_file.flush()
+                os.fsync(temporary_file.fileno())
+
+            os.replace(temporary_path, self.orders_path)
+
+        finally:
+            if temporary_path is not None and temporary_path.exists():
+                temporary_path.unlink()
+
+    def _save(self) -> None:
+        self._data["engine"] = self.ENGINE_NAME
+        self._data["mode"] = self.MODE
+        self._data["updated_at"] = self._now()
+
+        self._atomic_write(self._data)
+
+    def _next_order_id(self) -> str:
+        today = datetime.now().strftime("%Y%m%d")
+        prefix = f"PAPER-{today}-"
+
+        maximum_sequence = 0
+
+        for order in self._data["orders"]:
+            order_id = str(order.get("order_id", ""))
+
+            if not order_id.startswith(prefix):
+                continue
+
+            sequence_text = order_id[len(prefix):]
+
+            if sequence_text.isdigit():
+                maximum_sequence = max(
+                    maximum_sequence,
+                    int(sequence_text),
+                )
+
+        return f"{prefix}{maximum_sequence + 1:06d}"
+
+    def _find_order_index(self, order_id: str) -> int:
+        normalized_order_id = str(order_id).strip()
+
+        if not normalized_order_id:
+            raise ValueError("order_id媛 鍮꾩뼱 ?덉뒿?덈떎.")
+
+        for index, order in enumerate(self._data["orders"]):
+            if order["order_id"] == normalized_order_id:
+                return index
+
+        raise KeyError(f"二쇰Ц??李얠쓣 ???놁뒿?덈떎: {normalized_order_id}")
+
+    def _transition(
+        self,
+        order: Dict[str, Any],
+        new_status: str,
+    ) -> None:
+        current_status = order["status"]
+
+        if new_status not in self.VALID_STATUSES:
+            raise ValueError(f"?좏슚?섏? ?딆? 二쇰Ц ?곹깭?낅땲?? {new_status}")
+
+        allowed = self.ALLOWED_TRANSITIONS[current_status]
+
+        if new_status not in allowed:
+            raise ValueError(
+                "?덉슜?섏? ?딆? 二쇰Ц ?곹깭 ?꾪솚?낅땲?? "
+                f"{current_status} -> {new_status}"
+            )
+
+        order["status"] = new_status
+        order["updated_at"] = self._now()
+
+    @staticmethod
+    def _normalize_symbol(symbol: str) -> str:
+        normalized = str(symbol).strip()
+
+        if not normalized:
+            raise ValueError("symbol??鍮꾩뼱 ?덉뒿?덈떎.")
+
+        return normalized
+
+    @classmethod
+    def _normalize_side(cls, side: str) -> str:
+        normalized = str(side).strip().upper()
+
+        if normalized not in cls.VALID_SIDES:
+            raise ValueError("side??BUY ?먮뒗 SELL?댁뼱???⑸땲??")
+
+        return normalized
+
+    @staticmethod
+    def _normalize_price(price: float | int) -> float:
+        normalized = float(price)
+
+        if normalized <= 0:
+            raise ValueError("price??0蹂대떎 而ㅼ빞 ?⑸땲??")
+
+        return normalized
+
+    @staticmethod
+    def _normalize_qty(qty: float | int) -> int:
+        numeric_qty = float(qty)
+
+        if not numeric_qty.is_integer():
+            raise ValueError("援?궡二쇱떇 二쇰Ц ?섎웾? ?뺤닔?ъ빞 ?⑸땲??")
+
+        normalized = int(numeric_qty)
+
+        if normalized <= 0:
+            raise ValueError("qty??1 ?댁긽?댁뼱???⑸땲??")
+
+        return normalized
+
+    def create_order(
+        self,
+        symbol: str,
+        side: str,
+        price: float | int,
+        qty: float | int,
+        reason: str = "",
+        strategy: str = "",
+        client_order_key: str = "",
+    ) -> Dict[str, Any]:
+        """
+        ?좉퇋 二쇰Ц??NEW ?곹깭濡??앹꽦?쒕떎.
+
+        client_order_key:
+        ExecutionAI媛 ?숈씪 ?좏샇??媛숈? ?ㅻ? ?꾨떖?섎㈃ 以묐났 ?앹꽦??李⑤떒?쒕떎.
+        鍮?臾몄옄?댁씠硫?以묐났 ??寃?щ? ?섑뻾?섏? ?딅뒗??
+        """
+
+        with self._lock:
+            normalized_symbol = self._normalize_symbol(symbol)
+            normalized_side = self._normalize_side(side)
+            normalized_price = self._normalize_price(price)
+            normalized_qty = self._normalize_qty(qty)
+            normalized_client_key = str(client_order_key).strip()
+
+            if normalized_client_key:
+                for existing_order in self._data["orders"]:
+                    if (
+                        existing_order.get("client_order_key")
+                        == normalized_client_key
+                    ):
+                        raise ValueError(
+                            "以묐났 client_order_key 二쇰Ц?낅땲?? "
+                            f"{normalized_client_key}"
+                        )
+
+            timestamp = self._now()
+
+            order = {
+                "order_id": self._next_order_id(),
+                "client_order_key": normalized_client_key,
+                "symbol": normalized_symbol,
+                "side": normalized_side,
+                "price": normalized_price,
+                "qty": normalized_qty,
+                "filled_qty": 0,
+                "remaining_qty": normalized_qty,
+                "average_fill_price": 0.0,
+                "status": self.STATUS_NEW,
+                "reason": str(reason).strip(),
+                "strategy": str(strategy).strip(),
+                "reject_reason": "",
+                "cancel_reason": "",
+                "created_at": timestamp,
+                "accepted_at": "",
+                "filled_at": "",
+                "canceled_at": "",
+                "rejected_at": "",
+                "updated_at": timestamp,
+            }
+
+            self._data["orders"].append(order)
+            self._save()
+
+            return copy.deepcopy(order)
+
+    def accept_order(self, order_id: str) -> Dict[str, Any]:
+        with self._lock:
+            index = self._find_order_index(order_id)
+            order = self._data["orders"][index]
+
+            self._transition(order, self.STATUS_ACCEPTED)
+            order["accepted_at"] = self._now()
+
+            self._save()
+
+            return copy.deepcopy(order)
+
+    def fill_order(
+        self,
+        order_id: str,
+        fill_qty: float | int,
+        fill_price: float | int,
+    ) -> Dict[str, Any]:
+        """
+        二쇰Ц???좉퇋 泥닿껐 ?섎웾???꾩쟻?쒕떎.
+
+        fill_qty???대쾲 泥닿껐遺꾩씠??
+        ?꾩쟻 泥닿껐 ?섎웾??二쇰Ц ?섎웾怨?媛숈쑝硫?FILLED,
+        ?묒쑝硫?PARTIAL ?곹깭媛 ?쒕떎.
+        """
+
+        with self._lock:
+            index = self._find_order_index(order_id)
+            order = self._data["orders"][index]
+
+            current_status = order["status"]
+
+            if current_status not in {
+                self.STATUS_ACCEPTED,
+                self.STATUS_PARTIAL,
+            }:
+                raise ValueError(
+                    "ACCEPTED ?먮뒗 PARTIAL 二쇰Ц留?泥닿껐?????덉뒿?덈떎. "
+                    f"?꾩옱 ?곹깭: {current_status}"
+                )
+
+            normalized_fill_qty = self._normalize_qty(fill_qty)
+            normalized_fill_price = self._normalize_price(fill_price)
+
+            remaining_qty = int(order["remaining_qty"])
+
+            if normalized_fill_qty > remaining_qty:
+                raise ValueError(
+                    "泥닿껐 ?섎웾???붿뿬 二쇰Ц ?섎웾??珥덇낵?덉뒿?덈떎. "
+                    f"fill_qty={normalized_fill_qty}, "
+                    f"remaining_qty={remaining_qty}"
+                )
+
+            previous_filled_qty = int(order["filled_qty"])
+            previous_average_price = float(
+                order.get("average_fill_price", 0.0)
+            )
+
+            new_filled_qty = previous_filled_qty + normalized_fill_qty
+
+            total_fill_amount = (
+                previous_average_price * previous_filled_qty
+                + normalized_fill_price * normalized_fill_qty
+            )
+
+            new_average_fill_price = (
+                total_fill_amount / new_filled_qty
+            )
+
+            order["filled_qty"] = new_filled_qty
+            order["remaining_qty"] = int(order["qty"]) - new_filled_qty
+            order["average_fill_price"] = round(
+                new_average_fill_price,
+                4,
+            )
+
+            if order["remaining_qty"] == 0:
+                self._transition(order, self.STATUS_FILLED)
+                order["filled_at"] = self._now()
+            else:
+                self._transition(order, self.STATUS_PARTIAL)
+
+            self._save()
+
+            return copy.deepcopy(order)
+
+    def cancel_order(
+        self,
+        order_id: str,
+        reason: str = "",
+    ) -> Dict[str, Any]:
+        with self._lock:
+            index = self._find_order_index(order_id)
+            order = self._data["orders"][index]
+
+            self._transition(order, self.STATUS_CANCELED)
+            order["cancel_reason"] = str(reason).strip()
+            order["canceled_at"] = self._now()
+
+            self._save()
+
+            return copy.deepcopy(order)
+
+    def reject_order(
+        self,
+        order_id: str,
+        reason: str,
+    ) -> Dict[str, Any]:
+        with self._lock:
+            normalized_reason = str(reason).strip()
+
+            if not normalized_reason:
+                raise ValueError("二쇰Ц 嫄곗젅 ?ъ쑀媛 ?꾩슂?⑸땲??")
+
+            index = self._find_order_index(order_id)
+            order = self._data["orders"][index]
+
+            self._transition(order, self.STATUS_REJECTED)
+            order["reject_reason"] = normalized_reason
+            order["rejected_at"] = self._now()
+
+            self._save()
+
+            return copy.deepcopy(order)
+
+    def get_order(self, order_id: str) -> Dict[str, Any]:
+        with self._lock:
+            index = self._find_order_index(order_id)
+
+            return copy.deepcopy(self._data["orders"][index])
+
+    def list_orders(
+        self,
+        status: Optional[str] = None,
+        symbol: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        with self._lock:
+            normalized_status = (
+                str(status).strip().upper()
+                if status is not None
+                else None
+            )
+
+            normalized_symbol = (
+                str(symbol).strip()
+                if symbol is not None
+                else None
+            )
+
+            if (
+                normalized_status is not None
+                and normalized_status not in self.VALID_STATUSES
+            ):
+                raise ValueError(
+                    f"?좏슚?섏? ?딆? 二쇰Ц ?곹깭?낅땲?? {normalized_status}"
+                )
+
+            result = []
+
+            for order in self._data["orders"]:
+                if (
+                    normalized_status is not None
+                    and order["status"] != normalized_status
+                ):
+                    continue
+
+                if (
+                    normalized_symbol is not None
+                    and order["symbol"] != normalized_symbol
+                ):
+                    continue
+
+                result.append(copy.deepcopy(order))
+
+            return result
+
+    def get_open_orders(self) -> List[Dict[str, Any]]:
+        with self._lock:
+            return [
+                copy.deepcopy(order)
+                for order in self._data["orders"]
+                if order["status"] not in self.FINAL_STATUSES
+            ]
+
+
+def _run_self_test() -> None:
+    """
+    ?댁쁺 orders.json??蹂寃쏀븯吏 ?딅뒗 ?낅┰ ?⑥쐞 ?뚯뒪??
+    """
+
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        test_path = (
+            Path(temporary_directory)
+            / "orders.json"
+        )
+
+        manager = OrderManager(test_path)
+
+        created = manager.create_order(
+            symbol="005930",
+            side="BUY",
+            price=70000,
+            qty=2,
+            reason="SELF_TEST",
+            strategy="ORDER_MANAGER_V1",
+            client_order_key="SELF-TEST-001",
+        )
+
+        assert created["status"] == "NEW"
+        assert created["filled_qty"] == 0
+        assert created["remaining_qty"] == 2
+
+        accepted = manager.accept_order(created["order_id"])
+
+        assert accepted["status"] == "ACCEPTED"
+
+        partial = manager.fill_order(
+            order_id=created["order_id"],
+            fill_qty=1,
+            fill_price=70000,
+        )
+
+        assert partial["status"] == "PARTIAL"
+        assert partial["filled_qty"] == 1
+        assert partial["remaining_qty"] == 1
+
+        filled = manager.fill_order(
+            order_id=created["order_id"],
+            fill_qty=1,
+            fill_price=70100,
+        )
+
+        assert filled["status"] == "FILLED"
+        assert filled["filled_qty"] == 2
+        assert filled["remaining_qty"] == 0
+        assert filled["average_fill_price"] == 70050.0
+
+        restored_manager = OrderManager(test_path)
+        restored = restored_manager.get_order(created["order_id"])
+
+        assert restored["status"] == "FILLED"
+        assert restored["average_fill_price"] == 70050.0
+        assert len(restored_manager.list_orders()) == 1
+        assert restored_manager.get_open_orders() == []
+
+        print("ORDER_MANAGER_SELF_TEST=PASS")
+        print(f"ORDER_ID={restored['order_id']}")
+        print(f"STATUS={restored['status']}")
+        print(f"FILLED_QTY={restored['filled_qty']}")
+        print(
+            "AVERAGE_FILL_PRICE="
+            f"{restored['average_fill_price']}"
+        )
+        print("RESTART_RESTORE=PASS")
+
+
+if __name__ == "__main__":
+    _run_self_test()

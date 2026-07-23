@@ -1,8 +1,81 @@
 {
   "project": "ARGOS_STOCK",
+  "mode": "PAPER_ONLY",
+  "real_order": false,
+  "api_order": false,
+  "auto_real_order": false,
   "provider": "KIS",
-  "total": 50,
-  "count": 50,
+  "mock_mode": false,
+  "connected": true,
+  "status": "REAL_READY",
+  "market": "KOREA",
+  "symbols": [
+    "005930",
+    "000660",
+    "373220",
+    "207940",
+    "005380",
+    "000270",
+    "068270",
+    "035420",
+    "035720",
+    "051910",
+    "006400",
+    "005490",
+    "028260",
+    "012330",
+    "066570",
+    "096770",
+    "003550",
+    "034020",
+    "086790",
+    "032830",
+    "015760",
+    "017670",
+    "009540",
+    "010130",
+    "011200",
+    "024110",
+    "055550",
+    "105560",
+    "316140",
+    "086280",
+    "009150",
+    "010950",
+    "018260",
+    "267260",
+    "034730",
+    "251270",
+    "036570",
+    "030200",
+    "090430",
+    "326030",
+    "035250",
+    "352820",
+    "259960",
+    "078930",
+    "011070",
+    "047050",
+    "071050",
+    "128940",
+    "138040",
+    "161390"
+  ],
+  "batch": [
+    "009150",
+    "010950",
+    "018260",
+    "267260",
+    "034730",
+    "251270",
+    "036570",
+    "030200",
+    "090430",
+    "326030"
+  ],
+  "batch_start": 30,
+  "batch_end": 40,
+  "next_index": 40,
   "quotes": [
     {
       "symbol": "005930",
@@ -605,5 +678,87 @@
       "updated_at": "2026-06-28 22:24:38"
     }
   ],
-  "updated_at": "2026-06-28 22:25:02"
+  "batch_quotes": [
+    {
+      "symbol": "009150",
+      "status": "QUOTE_FAIL",
+      "status_code": 500,
+      "message": "{\"rt_cd\":\"1\",\"msg1\":\"기간이 만료된 token 입니다.\",\"msg_cd\":\"EGW00123\"}",
+      "source": "KIS_REAL",
+      "updated_at": "2026-07-18 19:22:57"
+    },
+    {
+      "symbol": "010950",
+      "status": "QUOTE_FAIL",
+      "status_code": 500,
+      "message": "{\"rt_cd\":\"1\",\"msg1\":\"기간이 만료된 token 입니다.\",\"msg_cd\":\"EGW00123\"}",
+      "source": "KIS_REAL",
+      "updated_at": "2026-07-18 19:22:58"
+    },
+    {
+      "symbol": "018260",
+      "status": "QUOTE_FAIL",
+      "status_code": 500,
+      "message": "{\"rt_cd\":\"1\",\"msg1\":\"기간이 만료된 token 입니다.\",\"msg_cd\":\"EGW00123\"}",
+      "source": "KIS_REAL",
+      "updated_at": "2026-07-18 19:22:59"
+    },
+    {
+      "symbol": "267260",
+      "status": "QUOTE_FAIL",
+      "status_code": 500,
+      "message": "{\"rt_cd\":\"1\",\"msg1\":\"기간이 만료된 token 입니다.\",\"msg_cd\":\"EGW00123\"}",
+      "source": "KIS_REAL",
+      "updated_at": "2026-07-18 19:23:00"
+    },
+    {
+      "symbol": "034730",
+      "status": "QUOTE_FAIL",
+      "status_code": 500,
+      "message": "{\"rt_cd\":\"1\",\"msg1\":\"기간이 만료된 token 입니다.\",\"msg_cd\":\"EGW00123\"}",
+      "source": "KIS_REAL",
+      "updated_at": "2026-07-18 19:23:01"
+    },
+    {
+      "symbol": "251270",
+      "status": "QUOTE_FAIL",
+      "status_code": 500,
+      "message": "{\"rt_cd\":\"1\",\"msg1\":\"기간이 만료된 token 입니다.\",\"msg_cd\":\"EGW00123\"}",
+      "source": "KIS_REAL",
+      "updated_at": "2026-07-18 19:23:02"
+    },
+    {
+      "symbol": "036570",
+      "status": "QUOTE_FAIL",
+      "status_code": 500,
+      "message": "{\"rt_cd\":\"1\",\"msg1\":\"기간이 만료된 token 입니다.\",\"msg_cd\":\"EGW00123\"}",
+      "source": "KIS_REAL",
+      "updated_at": "2026-07-18 19:23:04"
+    },
+    {
+      "symbol": "030200",
+      "status": "QUOTE_FAIL",
+      "status_code": 500,
+      "message": "{\"rt_cd\":\"1\",\"msg1\":\"기간이 만료된 token 입니다.\",\"msg_cd\":\"EGW00123\"}",
+      "source": "KIS_REAL",
+      "updated_at": "2026-07-18 19:23:05"
+    },
+    {
+      "symbol": "090430",
+      "status": "QUOTE_FAIL",
+      "status_code": 500,
+      "message": "{\"rt_cd\":\"1\",\"msg1\":\"기간이 만료된 token 입니다.\",\"msg_cd\":\"EGW00123\"}",
+      "source": "KIS_REAL",
+      "updated_at": "2026-07-18 19:23:06"
+    },
+    {
+      "symbol": "326030",
+      "status": "QUOTE_FAIL",
+      "status_code": 500,
+      "message": "{\"rt_cd\":\"1\",\"msg1\":\"기간이 만료된 token 입니다.\",\"msg_cd\":\"EGW00123\"}",
+      "source": "KIS_REAL",
+      "updated_at": "2026-07-18 19:23:07"
+    }
+  ],
+  "updated_at": "2026-07-18 19:23:08"
 }

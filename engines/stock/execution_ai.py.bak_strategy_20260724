@@ -1,4 +1,4 @@
-import hashlib
+﻿import hashlib
 import json
 import os
 from datetime import datetime
@@ -530,10 +530,6 @@ class ExecutionAI:
                 price=filled_price,
                 qty=filled_qty,
                 reason="AI_ENTRY",
-                strategy=order_result.get(
-                    "strategy",
-                    "UNSPECIFIED",
-                ),
             )
 
             if not success:

@@ -1,4 +1,4 @@
-import json
+﻿import json
 import os
 from datetime import datetime
 
@@ -209,8 +209,8 @@ class PortfolioEngine:
 
         self.account["win_rate"] = win_rate
 
-    def update_equity(self):
-        cash = float(
+        def update_equity(self):
+            cash = float(
             self.account.get("cash", 0)
             or 0
         )
@@ -260,7 +260,6 @@ class PortfolioEngine:
         price,
         qty,
         reason="PAPER_ENTRY",
-        strategy="UNSPECIFIED",
     ):
         symbol = str(symbol)
         side = str(side).upper()
@@ -359,9 +358,6 @@ class PortfolioEngine:
             "highest_price": entry_price,
             "status": "OPEN",
             "reason": reason,
-            "strategy": str(
-                strategy or "UNSPECIFIED"
-            ),
             "opened_at": now(),
         })
 
@@ -662,13 +658,6 @@ class PortfolioEngine:
             ),
             "pnl": pnl,
             "reason": reason,
-            "strategy": str(
-                stored_position.get(
-                    "strategy",
-                    "UNSPECIFIED",
-                )
-                or "UNSPECIFIED"
-            ),
             "opened_at": opened_at,
             "closed_at": now(),
         }
@@ -710,3 +699,4 @@ if __name__ == "__main__":
             ensure_ascii=False,
         )
     )
+

@@ -260,7 +260,6 @@ class PortfolioEngine:
         price,
         qty,
         reason="PAPER_ENTRY",
-        strategy="UNSPECIFIED",
     ):
         symbol = str(symbol)
         side = str(side).upper()
@@ -359,9 +358,6 @@ class PortfolioEngine:
             "highest_price": entry_price,
             "status": "OPEN",
             "reason": reason,
-            "strategy": str(
-                strategy or "UNSPECIFIED"
-            ),
             "opened_at": now(),
         })
 
@@ -662,13 +658,6 @@ class PortfolioEngine:
             ),
             "pnl": pnl,
             "reason": reason,
-            "strategy": str(
-                stored_position.get(
-                    "strategy",
-                    "UNSPECIFIED",
-                )
-                or "UNSPECIFIED"
-            ),
             "opened_at": opened_at,
             "closed_at": now(),
         }

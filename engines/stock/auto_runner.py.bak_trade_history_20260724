@@ -20,7 +20,7 @@ from engines.stock.risk_ai import run as run_risk
 from engines.stock.chief_ai import ChiefAI
 from engines.stock.decision_center import DecisionCenter
 from engines.stock.execution_ai import ExecutionAI
-from engines.stock.trade_history_engine import TradeHistoryEngine
+from engines.stock.history_engine import HistoryEngine
 from engines.stock.portfolio_engine import PortfolioEngine
 from engines.stock.pnl_engine import PnLEngine
 from engines.stock.learning_engine import LearningEngine
@@ -165,8 +165,8 @@ class AutoRunner:
 
         # 기록 및 손익
         history = step(
-            "TRADE_HISTORY",
-            lambda: TradeHistoryEngine().run()
+            "HISTORY",
+            lambda: HistoryEngine().run()
         )
 
         pnl = step(

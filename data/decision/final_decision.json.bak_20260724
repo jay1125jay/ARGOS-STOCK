@@ -1,0 +1,18 @@
+{
+  "project": "ARGOS_STOCK",
+  "engine": "decision_center",
+  "mode": "PAPER_ONLY",
+  "real_order": false,
+  "api_order": false,
+  "auto_real_order": false,
+  "signal": "SELL",
+  "score": -210,
+  "symbol": "161390",
+  "price": 62000.0,
+  "symbol_score": 25,
+  "symbol_reason": "PRICE_OK,STRONG_MOMENTUM_UP,VOLUME_LOW,INDICATOR_NEUTRAL",
+  "approved": true,
+  "chief_signal": "SELL",
+  "reason": "news_WAIT,disclosure_SELL,disclosure_SCORE_NEGATIVE,disclosure_RISK_HIGH,earnings_WAIT,sector_SELL,sector_SCORE_NEGATIVE,sector_RISK_HIGH,money_flow_WAIT,technical_WAIT,technical_SCORE_POSITIVE,risk_WAIT,market_state_SELL,market_state_SCORE_NEGATIVE,market_state_RISK_HIGH,CHIEF_SELL",
+  "updated_at": "2026-07-18 19:22:51"
+}

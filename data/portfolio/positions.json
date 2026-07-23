@@ -1,0 +1,21 @@
+[
+  {
+    "symbol": "005930",
+    "side": "BUY",
+    "entry": 70000.0,
+    "entry_price": 70000.0,
+    "current_price": 70000.0,
+    "qty": 1.0,
+    "gross_cost": 70000.0,
+    "cost": 70000.0,
+    "buy_fee": 10.5,
+    "entry_cost": 70010.5,
+    "tp": 71400.0,
+    "sl": 69300.0,
+    "highest_price": 70000.0,
+    "status": "OPEN",
+    "reason": "AI_ENTRY",
+    "strategy": "DUPLICATE_ORDER_TEST",
+    "opened_at": "2026-07-24 03:08:13"
+  }
+]

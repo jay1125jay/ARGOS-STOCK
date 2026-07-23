@@ -7,7 +7,7 @@ from engines.stock.data_hub import DataHub
 from engines.stock.chief_ai import ChiefAI
 from engines.stock.decision_center import DecisionCenter
 from engines.stock.portfolio_engine import PortfolioEngine
-from engines.stock.history_engine import HistoryEngine
+from engines.stock.trade_history_engine import TradeHistoryEngine
 
 ROOT = r"C:\ARGOS_STOCK"
 RUNNER_STATUS = os.path.join(ROOT, "data", "runner", "runner_status.json")
@@ -21,7 +21,7 @@ class PaperRunner:
         self.chief = ChiefAI()
         self.decision = DecisionCenter()
         self.portfolio = PortfolioEngine()
-        self.history = HistoryEngine()
+        self.trade_history = TradeHistoryEngine()
         self.running = False
 
     def now(self):
@@ -72,7 +72,7 @@ class PaperRunner:
 
             if tp and price >= tp:
                 trade = self.portfolio.close_position(pos, price, "TP")
-                self.history.add_trade(
+                self.trade_history.add_trade(
                     trade["symbol"],
                     trade["side"],
                     trade["entry"],
@@ -85,7 +85,7 @@ class PaperRunner:
 
             elif sl and price <= sl:
                 trade = self.portfolio.close_position(pos, price, "SL")
-                self.history.add_trade(
+                self.trade_history.add_trade(
                     trade["symbol"],
                     trade["side"],
                     trade["entry"],
@@ -156,7 +156,7 @@ class PaperRunner:
             "decision_score": decision.get("score", 0),
             "account": self.portfolio.account.get("cash", 0),
             "positions": len(self.portfolio.positions),
-            "history": len(self.history.get_all()),
+            "history": self.trade_history.run().get("total_trades", 0),
             "entry": entry,
             "closed": closed or [],
             "updated_at": self.now()
@@ -191,7 +191,7 @@ class PaperRunner:
         print("SCORE :", decision.get("score", 0))
         print("ACCOUNT :", self.portfolio.account.get("cash", 0))
         print("POSITION :", len(self.portfolio.positions))
-        print("HISTORY :", len(self.history.get_all()))
+        print("HISTORY :", self.trade_history.run().get("total_trades", 0))
 
         if entry:
             print("ENTRY :", entry)

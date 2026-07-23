@@ -29,7 +29,7 @@ PERFORMANCE = os.path.join(
 )
 
 
-# 留ㅻℓ 鍮꾩슜 ?ㅼ젙
+# 매매 비용 설정
 BROKER_FEE_RATE = 0.00015
 SELL_TAX_RATE = 0.0015
 SLIPPAGE_RATE = 0.0
@@ -215,14 +215,6 @@ class PortfolioEngine:
             or 0
         )
 
-        initial_cash = float(
-            self.account.get(
-                "initial_cash",
-                START_BALANCE,
-            )
-            or START_BALANCE
-        )
-
         position_value = 0.0
 
         for position in self.positions:
@@ -241,15 +233,8 @@ class PortfolioEngine:
 
             position_value += price * qty
 
-        equity = round(
+        self.account["equity"] = round(
             cash + position_value,
-            2,
-        )
-
-        self.account["equity"] = equity
-
-        self.account["total_pnl"] = round(
-            equity - initial_cash,
             2,
         )
 
@@ -260,7 +245,6 @@ class PortfolioEngine:
         price,
         qty,
         reason="PAPER_ENTRY",
-        strategy="UNSPECIFIED",
     ):
         symbol = str(symbol)
         side = str(side).upper()
@@ -359,9 +343,6 @@ class PortfolioEngine:
             "highest_price": entry_price,
             "status": "OPEN",
             "reason": reason,
-            "strategy": str(
-                strategy or "UNSPECIFIED"
-            ),
             "opened_at": now(),
         })
 
@@ -636,39 +617,30 @@ class PortfolioEngine:
 
         trade = {
             "symbol": symbol,
-            "side": "SELL",
+            "side": "BUY",
             "entry": entry_price,
             "exit": executed_exit,
             "qty": qty,
-            "gross_pnl": round(
-                (executed_exit - entry_price) * qty,
+            "gross_cost": round(
+                gross_cost,
                 2,
             ),
+            "gross_proceeds": gross_proceeds,
             "buy_fee": round(
                 buy_fee,
                 2,
             ),
-            "sell_fee": round(
-                sell_fee,
+            "sell_fee": sell_fee,
+            "tax": tax,
+            "total_fee": round(
+                buy_fee
+                + sell_fee
+                + tax,
                 2,
             ),
-            "tax": round(
-                tax,
-                2,
-            ),
-            "total_cost": round(
-                buy_fee + sell_fee + tax,
-                2,
-            ),
+            "net_proceeds": net_proceeds,
             "pnl": pnl,
             "reason": reason,
-            "strategy": str(
-                stored_position.get(
-                    "strategy",
-                    "UNSPECIFIED",
-                )
-                or "UNSPECIFIED"
-            ),
             "opened_at": opened_at,
             "closed_at": now(),
         }

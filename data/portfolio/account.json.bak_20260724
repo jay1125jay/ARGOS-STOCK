@@ -1,0 +1,16 @@
+{
+  "initial_cash": 10000.0,
+  "cash": 10000.0,
+  "equity": 10000.0,
+  "today_pnl": 0.0,
+  "total_pnl": 0.0,
+  "win": 0,
+  "loss": 0,
+  "win_rate": 0.0,
+  "trade_count": 0,
+  "total_buy_fee": 0.0,
+  "total_sell_fee": 0.0,
+  "total_tax": 0.0,
+  "total_cost": 0.0,
+  "updated_at": "2026-07-24 02:01:50"
+}

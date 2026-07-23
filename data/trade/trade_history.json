@@ -1,0 +1,58 @@
+{
+  "engine": "trade_history_engine",
+  "mode": "PAPER_ONLY",
+  "trades": [
+    {
+      "symbol": "005930",
+      "side": "SELL",
+      "entry": 70000.0,
+      "exit": 71000.0,
+      "qty": 1.0,
+      "gross_pnl": 1000.0,
+      "buy_fee": 10.5,
+      "sell_fee": 10.65,
+      "tax": 106.5,
+      "total_cost": 127.65,
+      "pnl": 872.35,
+      "reason": "AI_EXIT",
+      "opened_at": "2026-07-24 02:20:25",
+      "closed_at": "2026-07-24 02:23:43"
+    },
+    {
+      "symbol": "005930",
+      "side": "SELL",
+      "entry": 70000.0,
+      "exit": 71000.0,
+      "qty": 1.0,
+      "gross_pnl": 1000.0,
+      "buy_fee": 10.5,
+      "sell_fee": 10.65,
+      "tax": 106.5,
+      "total_cost": 127.65,
+      "pnl": 872.35,
+      "reason": "AI_EXIT",
+      "opened_at": "2026-07-24 02:44:36",
+      "closed_at": "2026-07-24 03:00:13"
+    },
+    {
+      "symbol": "005930",
+      "side": "SELL",
+      "entry": 70000.0,
+      "exit": 71000.0,
+      "qty": 1.0,
+      "gross_pnl": 1000.0,
+      "buy_fee": 10.5,
+      "sell_fee": 10.65,
+      "tax": 106.5,
+      "total_cost": 127.65,
+      "pnl": 872.35,
+      "reason": "AI_EXIT",
+      "strategy": "TEST_ORDER_V2",
+      "opened_at": "2026-07-24 03:04:37",
+      "closed_at": "2026-07-24 03:05:15"
+    }
+  ],
+  "total_trades": 3,
+  "total_pnl": 2617.05,
+  "updated_at": "2026-07-24 03:05:15"
+}

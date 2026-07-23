@@ -2,9 +2,17 @@
   "project": "ARGOS_STOCK",
   "engine": "PaperRunner",
   "mode": "PAPER_ONLY",
-  "running": true,
+  "running": false,
   "real_order": false,
   "api_order": false,
   "auto_real_order": false,
-  "updated_at": "2026-06-26 21:18:51"
+  "ai_signal": "SELL",
+  "final_signal": "SELL",
+  "decision_score": -170,
+  "account": 10000000,
+  "positions": 0,
+  "history": 0,
+  "entry": null,
+  "closed": [],
+  "updated_at": "2026-07-18 18:29:02"
 }
