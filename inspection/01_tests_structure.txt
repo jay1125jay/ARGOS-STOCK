@@ -1,0 +1,8 @@
+﻿
+FullName                                                                          Length
+--------                                                                          ------
+C:\ARGOS_STOCK\tests\__pycache__                                                        
+C:\ARGOS_STOCK\tests\test_order_manager_duplicate_key.py                          2283  
+C:\ARGOS_STOCK\tests\__pycache__\test_order_manager_duplicate_key.cpython-310.pyc 1563  
+
+

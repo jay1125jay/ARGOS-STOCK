@@ -1,0 +1,150 @@
+﻿import json
+import os
+from datetime import datetime
+
+ROOT = r"C:\ARGOS_STOCK"
+
+OUT = os.path.join(
+    ROOT,
+    "data",
+    "trade",
+    "trade_history.json"
+)
+
+
+class TradeHistoryEngine:
+
+    def now(self):
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    def default_data(self):
+        return {
+            "engine": "trade_history_engine",
+            "mode": "PAPER_ONLY",
+            "trades": [],
+            "total_trades": 0,
+            "total_pnl": 0,
+            "updated_at": self.now()
+        }
+
+    def load(self):
+
+        if not os.path.exists(OUT):
+            return self.default_data()
+
+        try:
+            with open(OUT, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            if not isinstance(data, dict):
+                return self.default_data()
+
+            if not isinstance(data.get("trades"), list):
+                data["trades"] = []
+
+            return data
+
+        except Exception:
+            return self.default_data()
+
+    def save(self, data):
+
+        os.makedirs(
+            os.path.dirname(OUT),
+            exist_ok=True
+        )
+
+        with open(OUT, "w", encoding="utf-8") as f:
+            json.dump(
+                data,
+                f,
+                indent=2,
+                ensure_ascii=False
+            )
+
+    def add_trade(self, trade):
+
+        if trade is None:
+            return None
+
+        if not isinstance(trade, dict):
+            return None
+
+        data = self.load()
+        trades = data.get("trades", [])
+
+        trade.setdefault(
+            "closed_at",
+            self.now()
+        )
+
+        trades.append(trade)
+
+        total_pnl = round(
+            sum(
+                float(t.get("pnl", 0) or 0)
+                for t in trades
+            ),
+            2
+        )
+
+        data["engine"] = "trade_history_engine"
+        data["mode"] = "PAPER_ONLY"
+        data["trades"] = trades
+        data["total_trades"] = len(trades)
+        data["total_pnl"] = total_pnl
+        data["updated_at"] = self.now()
+
+        self.save(data)
+
+        return trade
+
+    def run(self):
+
+        data = self.load()
+        trades = data.get("trades", [])
+
+        total_pnl = round(
+            sum(
+                float(t.get("pnl", 0) or 0)
+                for t in trades
+            ),
+            2
+        )
+
+        wins = len([
+            trade
+            for trade in trades
+            if float(trade.get("pnl", 0) or 0) > 0
+        ])
+
+        losses = len([
+            trade
+            for trade in trades
+            if float(trade.get("pnl", 0) or 0) < 0
+        ])
+
+        return {
+            "engine": "trade_history_engine",
+            "status": "READY",
+            "mode": "PAPER_ONLY",
+            "total_trades": len(trades),
+            "wins": wins,
+            "losses": losses,
+            "total_pnl": total_pnl,
+            "updated_at": self.now()
+        }
+
+
+def run():
+    return TradeHistoryEngine().run()
+
+
+if __name__ == "__main__":
+    print(
+        json.dumps(
+            run(),
+            indent=2,
+            ensure_ascii=False
+        )
+    )

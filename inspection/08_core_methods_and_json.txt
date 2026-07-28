@@ -1,0 +1,1115 @@
+﻿
+============================================================
+.\engines\stock\portfolio_engine.py
+============================================================
+
+  engines\stock\portfolio_engine.py:66:    os.replace(temp_path, path)
+  engines\stock\portfolio_engine.py:67:
+  engines\stock\portfolio_engine.py:68:
+  engines\stock\portfolio_engine.py:69:class PortfolioEngine:
+  engines\stock\portfolio_engine.py:70:
+> engines\stock\portfolio_engine.py:71:    def __init__(self):
+  engines\stock\portfolio_engine.py:72:        self.account = load_json(
+  engines\stock\portfolio_engine.py:73:            ACCOUNT,
+  engines\stock\portfolio_engine.py:74:            self.default_account(),
+  engines\stock\portfolio_engine.py:75:        )
+  engines\stock\portfolio_engine.py:76:
+  engines\stock\portfolio_engine.py:77:        self.positions = load_json(
+  engines\stock\portfolio_engine.py:78:            POSITIONS,
+  engines\stock\portfolio_engine.py:79:            [],
+  engines\stock\portfolio_engine.py:80:        )
+  engines\stock\portfolio_engine.py:81:
+  engines\stock\portfolio_engine.py:82:        self.performance = load_json(
+  engines\stock\portfolio_engine.py:83:            PERFORMANCE,
+  engines\stock\portfolio_engine.py:84:            self.default_performance(),
+  engines\stock\portfolio_engine.py:85:        )
+  engines\stock\portfolio_engine.py:86:
+  engines\stock\portfolio_engine.py:87:        if not isinstance(self.account, dict):
+  engines\stock\portfolio_engine.py:88:            self.account = self.default_account()
+  engines\stock\portfolio_engine.py:89:
+  engines\stock\portfolio_engine.py:90:        if not isinstance(self.positions, list):
+  engines\stock\portfolio_engine.py:91:            self.positions = []
+  engines\stock\portfolio_engine.py:92:
+  engines\stock\portfolio_engine.py:93:        if not isinstance(self.performance, dict):
+  engines\stock\portfolio_engine.py:94:            self.performance = self.default_performance()
+  engines\stock\portfolio_engine.py:95:
+  engines\stock\portfolio_engine.py:96:        self.normalize()
+  engines\stock\portfolio_engine.py:97:
+  engines\stock\portfolio_engine.py:98:    def default_account(self):
+  engines\stock\portfolio_engine.py:99:        return {
+  engines\stock\portfolio_engine.py:100:            "initial_cash": float(START_BALANCE),
+  engines\stock\portfolio_engine.py:101:            "cash": float(START_BALANCE),
+  engines\stock\portfolio_engine.py:102:            "equity": float(START_BALANCE),
+  engines\stock\portfolio_engine.py:103:            "today_pnl": 0.0,
+  engines\stock\portfolio_engine.py:104:            "total_pnl": 0.0,
+  engines\stock\portfolio_engine.py:105:            "win": 0,
+  engines\stock\portfolio_engine.py:106:            "loss": 0,
+  engines\stock\portfolio_engine.py:107:            "win_rate": 0.0,
+  engines\stock\portfolio_engine.py:108:            "trade_count": 0,
+  engines\stock\portfolio_engine.py:109:            "total_buy_fee": 0.0,
+  engines\stock\portfolio_engine.py:110:            "total_sell_fee": 0.0,
+  engines\stock\portfolio_engine.py:111:            "total_tax": 0.0,
+  engines\stock\portfolio_engine.py:112:            "total_cost": 0.0,
+  engines\stock\portfolio_engine.py:113:            "updated_at": "",
+  engines\stock\portfolio_engine.py:114:        }
+  engines\stock\portfolio_engine.py:115:
+  engines\stock\portfolio_engine.py:116:    def default_performance(self):
+  engines\stock\portfolio_engine.py:117:        return {
+  engines\stock\portfolio_engine.py:118:            "today": 0.0,
+  engines\stock\portfolio_engine.py:119:            "week": 0.0,
+  engines\stock\portfolio_engine.py:120:            "month": 0.0,
+  engines\stock\portfolio_engine.py:121:            "total": 0.0,
+  engines\stock\portfolio_engine.py:122:            "win": 0,
+  engines\stock\portfolio_engine.py:123:            "loss": 0,
+  engines\stock\portfolio_engine.py:124:            "trade_count": 0,
+  engines\stock\portfolio_engine.py:125:            "win_rate": 0.0,
+  engines\stock\portfolio_engine.py:126:            "updated_at": "",
+  engines\stock\portfolio_engine.py:127:        }
+  engines\stock\portfolio_engine.py:128:
+  engines\stock\portfolio_engine.py:129:    def normalize(self):
+  engines\stock\portfolio_engine.py:130:        account_defaults = self.default_account()
+  engines\stock\portfolio_engine.py:131:
+  engines\stock\portfolio_engine.py:132:        for key, value in account_defaults.items():
+  engines\stock\portfolio_engine.py:133:            if key not in self.account:
+  engines\stock\portfolio_engine.py:134:                self.account[key] = value
+  engines\stock\portfolio_engine.py:135:
+  engines\stock\portfolio_engine.py:136:        performance_defaults = self.default_performance()
+  engines\stock\portfolio_engine.py:137:
+  engines\stock\portfolio_engine.py:138:        for key, value in performance_defaults.items():
+  engines\stock\portfolio_engine.py:139:            if key not in self.performance:
+  engines\stock\portfolio_engine.py:140:                self.performance[key] = value
+  engines\stock\portfolio_engine.py:141:
+  engines\stock\portfolio_engine.py:142:        self.update_win_rate()
+  engines\stock\portfolio_engine.py:143:        self.update_equity()
+  engines\stock\portfolio_engine.py:144:
+  engines\stock\portfolio_engine.py:145:    def save_all(self):
+  engines\stock\portfolio_engine.py:146:        self.update_win_rate()
+  engines\stock\portfolio_engine.py:147:        self.update_equity()
+  engines\stock\portfolio_engine.py:148:
+  engines\stock\portfolio_engine.py:149:        updated_at = now()
+  engines\stock\portfolio_engine.py:150:
+  engines\stock\portfolio_engine.py:151:        self.account["updated_at"] = updated_at
+
+
+
+
+
+
+  engines\stock\portfolio_engine.py:367:
+  engines\stock\portfolio_engine.py:368:        self.save_all()
+  engines\stock\portfolio_engine.py:369:
+  engines\stock\portfolio_engine.py:370:        return True
+  engines\stock\portfolio_engine.py:371:
+> engines\stock\portfolio_engine.py:372:    def close_position(
+  engines\stock\portfolio_engine.py:373:        self,
+  engines\stock\portfolio_engine.py:374:        position,
+  engines\stock\portfolio_engine.py:375:        exit_price,
+  engines\stock\portfolio_engine.py:376:        reason="PAPER_EXIT",
+  engines\stock\portfolio_engine.py:377:    ):
+  engines\stock\portfolio_engine.py:378:        if not isinstance(position, dict):
+  engines\stock\portfolio_engine.py:379:            return None
+  engines\stock\portfolio_engine.py:380:
+  engines\stock\portfolio_engine.py:381:        symbol = position.get("symbol")
+  engines\stock\portfolio_engine.py:382:        opened_at = position.get("opened_at")
+  engines\stock\portfolio_engine.py:383:
+  engines\stock\portfolio_engine.py:384:        stored_position = next(
+  engines\stock\portfolio_engine.py:385:            (
+  engines\stock\portfolio_engine.py:386:                item
+  engines\stock\portfolio_engine.py:387:                for item in self.positions
+  engines\stock\portfolio_engine.py:388:                if item.get("symbol") == symbol
+  engines\stock\portfolio_engine.py:389:                and item.get("opened_at") == opened_at
+  engines\stock\portfolio_engine.py:390:            ),
+  engines\stock\portfolio_engine.py:391:            None,
+  engines\stock\portfolio_engine.py:392:        )
+  engines\stock\portfolio_engine.py:393:
+  engines\stock\portfolio_engine.py:394:        if stored_position is None:
+  engines\stock\portfolio_engine.py:395:            return None
+  engines\stock\portfolio_engine.py:396:
+  engines\stock\portfolio_engine.py:397:        entry_price = float(
+  engines\stock\portfolio_engine.py:398:            stored_position.get(
+  engines\stock\portfolio_engine.py:399:                "entry",
+  engines\stock\portfolio_engine.py:400:                stored_position.get(
+  engines\stock\portfolio_engine.py:401:                    "entry_price",
+  engines\stock\portfolio_engine.py:402:                    0,
+  engines\stock\portfolio_engine.py:403:                ),
+  engines\stock\portfolio_engine.py:404:            )
+  engines\stock\portfolio_engine.py:405:            or 0
+  engines\stock\portfolio_engine.py:406:        )
+  engines\stock\portfolio_engine.py:407:
+  engines\stock\portfolio_engine.py:408:        qty = float(
+  engines\stock\portfolio_engine.py:409:            stored_position.get("qty", 0)
+  engines\stock\portfolio_engine.py:410:            or 0
+  engines\stock\portfolio_engine.py:411:        )
+  engines\stock\portfolio_engine.py:412:
+  engines\stock\portfolio_engine.py:413:        exit_price = float(exit_price or 0)
+  engines\stock\portfolio_engine.py:414:
+  engines\stock\portfolio_engine.py:415:        if entry_price <= 0:
+  engines\stock\portfolio_engine.py:416:            return None
+  engines\stock\portfolio_engine.py:417:
+  engines\stock\portfolio_engine.py:418:        if exit_price <= 0:
+  engines\stock\portfolio_engine.py:419:            return None
+  engines\stock\portfolio_engine.py:420:
+  engines\stock\portfolio_engine.py:421:        if qty <= 0:
+  engines\stock\portfolio_engine.py:422:            return None
+  engines\stock\portfolio_engine.py:423:
+  engines\stock\portfolio_engine.py:424:        executed_exit = round(
+  engines\stock\portfolio_engine.py:425:            exit_price * (1 - SLIPPAGE_RATE),
+  engines\stock\portfolio_engine.py:426:            6,
+  engines\stock\portfolio_engine.py:427:        )
+  engines\stock\portfolio_engine.py:428:
+  engines\stock\portfolio_engine.py:429:        gross_proceeds = round(
+  engines\stock\portfolio_engine.py:430:            executed_exit * qty,
+  engines\stock\portfolio_engine.py:431:            2,
+  engines\stock\portfolio_engine.py:432:        )
+  engines\stock\portfolio_engine.py:433:
+  engines\stock\portfolio_engine.py:434:        gross_cost = float(
+  engines\stock\portfolio_engine.py:435:            stored_position.get(
+  engines\stock\portfolio_engine.py:436:                "gross_cost",
+  engines\stock\portfolio_engine.py:437:                entry_price * qty,
+  engines\stock\portfolio_engine.py:438:            )
+  engines\stock\portfolio_engine.py:439:            or 0
+  engines\stock\portfolio_engine.py:440:        )
+  engines\stock\portfolio_engine.py:441:
+  engines\stock\portfolio_engine.py:442:        buy_fee = float(
+  engines\stock\portfolio_engine.py:443:            stored_position.get(
+  engines\stock\portfolio_engine.py:444:                "buy_fee",
+  engines\stock\portfolio_engine.py:445:                0,
+  engines\stock\portfolio_engine.py:446:            )
+  engines\stock\portfolio_engine.py:447:            or 0
+  engines\stock\portfolio_engine.py:448:        )
+  engines\stock\portfolio_engine.py:449:
+  engines\stock\portfolio_engine.py:450:        sell_fee = round(
+  engines\stock\portfolio_engine.py:451:            gross_proceeds * BROKER_FEE_RATE,
+  engines\stock\portfolio_engine.py:452:            2,
+
+
+
+
+
+============================================================
+.\engines\stock\trade_history_engine.py
+============================================================
+
+
+  engines\stock\trade_history_engine.py:60:                f,
+  engines\stock\trade_history_engine.py:61:                indent=2,
+  engines\stock\trade_history_engine.py:62:                ensure_ascii=False
+  engines\stock\trade_history_engine.py:63:            )
+  engines\stock\trade_history_engine.py:64:
+> engines\stock\trade_history_engine.py:65:    def add_trade(self, trade):
+  engines\stock\trade_history_engine.py:66:
+  engines\stock\trade_history_engine.py:67:        if trade is None:
+  engines\stock\trade_history_engine.py:68:            return None
+  engines\stock\trade_history_engine.py:69:
+  engines\stock\trade_history_engine.py:70:        if not isinstance(trade, dict):
+  engines\stock\trade_history_engine.py:71:            return None
+  engines\stock\trade_history_engine.py:72:
+  engines\stock\trade_history_engine.py:73:        data = self.load()
+  engines\stock\trade_history_engine.py:74:        trades = data.get("trades", [])
+  engines\stock\trade_history_engine.py:75:
+  engines\stock\trade_history_engine.py:76:        trade.setdefault(
+  engines\stock\trade_history_engine.py:77:            "closed_at",
+  engines\stock\trade_history_engine.py:78:            self.now()
+  engines\stock\trade_history_engine.py:79:        )
+  engines\stock\trade_history_engine.py:80:
+  engines\stock\trade_history_engine.py:81:        trades.append(trade)
+  engines\stock\trade_history_engine.py:82:
+  engines\stock\trade_history_engine.py:83:        total_pnl = round(
+  engines\stock\trade_history_engine.py:84:            sum(
+  engines\stock\trade_history_engine.py:85:                float(t.get("pnl", 0) or 0)
+  engines\stock\trade_history_engine.py:86:                for t in trades
+  engines\stock\trade_history_engine.py:87:            ),
+  engines\stock\trade_history_engine.py:88:            2
+  engines\stock\trade_history_engine.py:89:        )
+  engines\stock\trade_history_engine.py:90:
+  engines\stock\trade_history_engine.py:91:        data["engine"] = "trade_history_engine"
+  engines\stock\trade_history_engine.py:92:        data["mode"] = "PAPER_ONLY"
+  engines\stock\trade_history_engine.py:93:        data["trades"] = trades
+  engines\stock\trade_history_engine.py:94:        data["total_trades"] = len(trades)
+  engines\stock\trade_history_engine.py:95:        data["total_pnl"] = total_pnl
+  engines\stock\trade_history_engine.py:96:        data["updated_at"] = self.now()
+  engines\stock\trade_history_engine.py:97:
+  engines\stock\trade_history_engine.py:98:        self.save(data)
+  engines\stock\trade_history_engine.py:99:
+  engines\stock\trade_history_engine.py:100:        return trade
+  engines\stock\trade_history_engine.py:101:
+  engines\stock\trade_history_engine.py:102:    def run(self):
+  engines\stock\trade_history_engine.py:103:
+  engines\stock\trade_history_engine.py:104:        data = self.load()
+  engines\stock\trade_history_engine.py:105:        trades = data.get("trades", [])
+  engines\stock\trade_history_engine.py:106:
+  engines\stock\trade_history_engine.py:107:        total_pnl = round(
+  engines\stock\trade_history_engine.py:108:            sum(
+  engines\stock\trade_history_engine.py:109:                float(t.get("pnl", 0) or 0)
+  engines\stock\trade_history_engine.py:110:                for t in trades
+  engines\stock\trade_history_engine.py:111:            ),
+  engines\stock\trade_history_engine.py:112:            2
+  engines\stock\trade_history_engine.py:113:        )
+  engines\stock\trade_history_engine.py:114:
+  engines\stock\trade_history_engine.py:115:        wins = len([
+  engines\stock\trade_history_engine.py:116:            trade
+  engines\stock\trade_history_engine.py:117:            for trade in trades
+  engines\stock\trade_history_engine.py:118:            if float(trade.get("pnl", 0) or 0) > 0
+  engines\stock\trade_history_engine.py:119:        ])
+  engines\stock\trade_history_engine.py:120:
+  engines\stock\trade_history_engine.py:121:        losses = len([
+  engines\stock\trade_history_engine.py:122:            trade
+  engines\stock\trade_history_engine.py:123:            for trade in trades
+  engines\stock\trade_history_engine.py:124:            if float(trade.get("pnl", 0) or 0) < 0
+  engines\stock\trade_history_engine.py:125:        ])
+  engines\stock\trade_history_engine.py:126:
+  engines\stock\trade_history_engine.py:127:        return {
+  engines\stock\trade_history_engine.py:128:            "engine": "trade_history_engine",
+  engines\stock\trade_history_engine.py:129:            "status": "READY",
+  engines\stock\trade_history_engine.py:130:            "mode": "PAPER_ONLY",
+  engines\stock\trade_history_engine.py:131:            "total_trades": len(trades),
+  engines\stock\trade_history_engine.py:132:            "wins": wins,
+  engines\stock\trade_history_engine.py:133:            "losses": losses,
+  engines\stock\trade_history_engine.py:134:            "total_pnl": total_pnl,
+  engines\stock\trade_history_engine.py:135:            "updated_at": self.now()
+  engines\stock\trade_history_engine.py:136:        }
+  engines\stock\trade_history_engine.py:137:
+  engines\stock\trade_history_engine.py:138:
+  engines\stock\trade_history_engine.py:139:def run():
+  engines\stock\trade_history_engine.py:140:    return TradeHistoryEngine().run()
+  engines\stock\trade_history_engine.py:141:
+  engines\stock\trade_history_engine.py:142:
+  engines\stock\trade_history_engine.py:143:if __name__ == "__main__":
+  engines\stock\trade_history_engine.py:144:    print(
+  engines\stock\trade_history_engine.py:145:        json.dumps(
+
+
+
+
+  engines\stock\trade_history_engine.py:97:
+  engines\stock\trade_history_engine.py:98:        self.save(data)
+  engines\stock\trade_history_engine.py:99:
+  engines\stock\trade_history_engine.py:100:        return trade
+  engines\stock\trade_history_engine.py:101:
+> engines\stock\trade_history_engine.py:102:    def run(self):
+  engines\stock\trade_history_engine.py:103:
+  engines\stock\trade_history_engine.py:104:        data = self.load()
+  engines\stock\trade_history_engine.py:105:        trades = data.get("trades", [])
+  engines\stock\trade_history_engine.py:106:
+  engines\stock\trade_history_engine.py:107:        total_pnl = round(
+  engines\stock\trade_history_engine.py:108:            sum(
+  engines\stock\trade_history_engine.py:109:                float(t.get("pnl", 0) or 0)
+  engines\stock\trade_history_engine.py:110:                for t in trades
+  engines\stock\trade_history_engine.py:111:            ),
+  engines\stock\trade_history_engine.py:112:            2
+  engines\stock\trade_history_engine.py:113:        )
+  engines\stock\trade_history_engine.py:114:
+  engines\stock\trade_history_engine.py:115:        wins = len([
+  engines\stock\trade_history_engine.py:116:            trade
+  engines\stock\trade_history_engine.py:117:            for trade in trades
+  engines\stock\trade_history_engine.py:118:            if float(trade.get("pnl", 0) or 0) > 0
+  engines\stock\trade_history_engine.py:119:        ])
+  engines\stock\trade_history_engine.py:120:
+  engines\stock\trade_history_engine.py:121:        losses = len([
+  engines\stock\trade_history_engine.py:122:            trade
+  engines\stock\trade_history_engine.py:123:            for trade in trades
+  engines\stock\trade_history_engine.py:124:            if float(trade.get("pnl", 0) or 0) < 0
+  engines\stock\trade_history_engine.py:125:        ])
+  engines\stock\trade_history_engine.py:126:
+  engines\stock\trade_history_engine.py:127:        return {
+  engines\stock\trade_history_engine.py:128:            "engine": "trade_history_engine",
+  engines\stock\trade_history_engine.py:129:            "status": "READY",
+  engines\stock\trade_history_engine.py:130:            "mode": "PAPER_ONLY",
+  engines\stock\trade_history_engine.py:131:            "total_trades": len(trades),
+  engines\stock\trade_history_engine.py:132:            "wins": wins,
+  engines\stock\trade_history_engine.py:133:            "losses": losses,
+  engines\stock\trade_history_engine.py:134:            "total_pnl": total_pnl,
+  engines\stock\trade_history_engine.py:135:            "updated_at": self.now()
+  engines\stock\trade_history_engine.py:136:        }
+  engines\stock\trade_history_engine.py:137:
+  engines\stock\trade_history_engine.py:138:
+> engines\stock\trade_history_engine.py:139:def run():
+  engines\stock\trade_history_engine.py:140:    return TradeHistoryEngine().run()
+  engines\stock\trade_history_engine.py:141:
+  engines\stock\trade_history_engine.py:142:
+  engines\stock\trade_history_engine.py:143:if __name__ == "__main__":
+  engines\stock\trade_history_engine.py:144:    print(
+  engines\stock\trade_history_engine.py:145:        json.dumps(
+  engines\stock\trade_history_engine.py:146:            run(),
+  engines\stock\trade_history_engine.py:147:            indent=2,
+  engines\stock\trade_history_engine.py:148:            ensure_ascii=False
+  engines\stock\trade_history_engine.py:149:        )
+  engines\stock\trade_history_engine.py:150:    )
+
+
+
+
+============================================================
+.\engines\stock\pnl_engine.py
+============================================================
+
+
+  engines\stock\pnl_engine.py:33:class PnLEngine:
+  engines\stock\pnl_engine.py:34:
+  engines\stock\pnl_engine.py:35:    def now(self):
+  engines\stock\pnl_engine.py:36:        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+  engines\stock\pnl_engine.py:37:
+> engines\stock\pnl_engine.py:38:    def run(self):
+  engines\stock\pnl_engine.py:39:
+  engines\stock\pnl_engine.py:40:        account = load(ACCOUNT, {})
+  engines\stock\pnl_engine.py:41:        trade_data = load(
+  engines\stock\pnl_engine.py:42:            TRADE_HISTORY,
+  engines\stock\pnl_engine.py:43:            {"trades": []}
+  engines\stock\pnl_engine.py:44:        )
+  engines\stock\pnl_engine.py:45:
+  engines\stock\pnl_engine.py:46:        trades_list = trade_data.get("trades", [])
+  engines\stock\pnl_engine.py:47:
+  engines\stock\pnl_engine.py:48:        if not isinstance(trades_list, list):
+  engines\stock\pnl_engine.py:49:            trades_list = []
+  engines\stock\pnl_engine.py:50:
+  engines\stock\pnl_engine.py:51:        total_pnl = round(
+  engines\stock\pnl_engine.py:52:            sum(
+  engines\stock\pnl_engine.py:53:                float(
+  engines\stock\pnl_engine.py:54:                    trade.get("pnl", 0)
+  engines\stock\pnl_engine.py:55:                    or 0
+  engines\stock\pnl_engine.py:56:                )
+  engines\stock\pnl_engine.py:57:                for trade in trades_list
+  engines\stock\pnl_engine.py:58:            ),
+  engines\stock\pnl_engine.py:59:            2
+  engines\stock\pnl_engine.py:60:        )
+  engines\stock\pnl_engine.py:61:
+  engines\stock\pnl_engine.py:62:        win = len([
+  engines\stock\pnl_engine.py:63:            trade
+  engines\stock\pnl_engine.py:64:            for trade in trades_list
+  engines\stock\pnl_engine.py:65:            if float(
+  engines\stock\pnl_engine.py:66:                trade.get("pnl", 0)
+  engines\stock\pnl_engine.py:67:                or 0
+  engines\stock\pnl_engine.py:68:            ) > 0
+  engines\stock\pnl_engine.py:69:        ])
+  engines\stock\pnl_engine.py:70:
+  engines\stock\pnl_engine.py:71:        loss = len([
+  engines\stock\pnl_engine.py:72:            trade
+  engines\stock\pnl_engine.py:73:            for trade in trades_list
+  engines\stock\pnl_engine.py:74:            if float(
+  engines\stock\pnl_engine.py:75:                trade.get("pnl", 0)
+  engines\stock\pnl_engine.py:76:                or 0
+  engines\stock\pnl_engine.py:77:            ) < 0
+  engines\stock\pnl_engine.py:78:        ])
+  engines\stock\pnl_engine.py:79:
+  engines\stock\pnl_engine.py:80:        trades = len(trades_list)
+  engines\stock\pnl_engine.py:81:
+  engines\stock\pnl_engine.py:82:        win_rate = 0.0
+  engines\stock\pnl_engine.py:83:
+  engines\stock\pnl_engine.py:84:        if trades > 0:
+  engines\stock\pnl_engine.py:85:            win_rate = round(
+  engines\stock\pnl_engine.py:86:                win / trades * 100,
+  engines\stock\pnl_engine.py:87:                2
+  engines\stock\pnl_engine.py:88:            )
+  engines\stock\pnl_engine.py:89:
+  engines\stock\pnl_engine.py:90:        cash = round(
+  engines\stock\pnl_engine.py:91:            float(
+  engines\stock\pnl_engine.py:92:                account.get("cash", 0)
+  engines\stock\pnl_engine.py:93:                or 0
+  engines\stock\pnl_engine.py:94:            ),
+  engines\stock\pnl_engine.py:95:            2
+  engines\stock\pnl_engine.py:96:        )
+  engines\stock\pnl_engine.py:97:
+  engines\stock\pnl_engine.py:98:        equity = round(
+  engines\stock\pnl_engine.py:99:            float(
+  engines\stock\pnl_engine.py:100:                account.get(
+  engines\stock\pnl_engine.py:101:                    "equity",
+  engines\stock\pnl_engine.py:102:                    cash
+  engines\stock\pnl_engine.py:103:                )
+  engines\stock\pnl_engine.py:104:                or cash
+  engines\stock\pnl_engine.py:105:            ),
+  engines\stock\pnl_engine.py:106:            2
+  engines\stock\pnl_engine.py:107:        )
+  engines\stock\pnl_engine.py:108:
+  engines\stock\pnl_engine.py:109:        today_pnl = round(
+  engines\stock\pnl_engine.py:110:            float(
+  engines\stock\pnl_engine.py:111:                account.get(
+  engines\stock\pnl_engine.py:112:                    "today_pnl",
+  engines\stock\pnl_engine.py:113:                    total_pnl
+  engines\stock\pnl_engine.py:114:                )
+  engines\stock\pnl_engine.py:115:                or 0
+  engines\stock\pnl_engine.py:116:            ),
+  engines\stock\pnl_engine.py:117:            2
+  engines\stock\pnl_engine.py:118:        )
+
+
+
+
+============================================================
+.\engines\stock\risk_manager.py
+============================================================
+
+  engines\stock\risk_manager.py:73:    os.replace(temp_path, path)
+  engines\stock\risk_manager.py:74:
+  engines\stock\risk_manager.py:75:
+  engines\stock\risk_manager.py:76:class RiskManager:
+  engines\stock\risk_manager.py:77:
+> engines\stock\risk_manager.py:78:    def __init__(self):
+  engines\stock\risk_manager.py:79:        self.account = load_json(
+  engines\stock\risk_manager.py:80:            ACCOUNT,
+  engines\stock\risk_manager.py:81:            {},
+  engines\stock\risk_manager.py:82:        )
+  engines\stock\risk_manager.py:83:
+  engines\stock\risk_manager.py:84:        self.positions = load_json(
+  engines\stock\risk_manager.py:85:            POSITIONS,
+  engines\stock\risk_manager.py:86:            [],
+  engines\stock\risk_manager.py:87:        )
+  engines\stock\risk_manager.py:88:
+  engines\stock\risk_manager.py:89:        if not isinstance(self.account, dict):
+  engines\stock\risk_manager.py:90:            self.account = {}
+  engines\stock\risk_manager.py:91:
+  engines\stock\risk_manager.py:92:        if not isinstance(self.positions, list):
+  engines\stock\risk_manager.py:93:            self.positions = []
+  engines\stock\risk_manager.py:94:
+  engines\stock\risk_manager.py:95:    def result(
+  engines\stock\risk_manager.py:96:        self,
+  engines\stock\risk_manager.py:97:        approved,
+  engines\stock\risk_manager.py:98:        reason,
+  engines\stock\risk_manager.py:99:        signal,
+  engines\stock\risk_manager.py:100:        symbol,
+  engines\stock\risk_manager.py:101:        price,
+  engines\stock\risk_manager.py:102:        qty,
+  engines\stock\risk_manager.py:103:    ):
+  engines\stock\risk_manager.py:104:        result = {
+  engines\stock\risk_manager.py:105:            "engine": "risk_manager",
+  engines\stock\risk_manager.py:106:            "status": "APPROVED" if approved else "BLOCKED",
+  engines\stock\risk_manager.py:107:            "mode": MODE,
+  engines\stock\risk_manager.py:108:            "approved": approved,
+  engines\stock\risk_manager.py:109:            "reason": reason,
+  engines\stock\risk_manager.py:110:            "signal": signal,
+  engines\stock\risk_manager.py:111:            "symbol": symbol,
+  engines\stock\risk_manager.py:112:            "price": price,
+  engines\stock\risk_manager.py:113:            "qty": qty,
+  engines\stock\risk_manager.py:114:            "position_count": len(self.positions),
+  engines\stock\risk_manager.py:115:            "cash": round(
+  engines\stock\risk_manager.py:116:                float(
+  engines\stock\risk_manager.py:117:                    self.account.get("cash", 0)
+  engines\stock\risk_manager.py:118:                    or 0
+  engines\stock\risk_manager.py:119:                ),
+  engines\stock\risk_manager.py:120:                2,
+  engines\stock\risk_manager.py:121:            ),
+  engines\stock\risk_manager.py:122:            "equity": round(
+  engines\stock\risk_manager.py:123:                float(
+  engines\stock\risk_manager.py:124:                    self.account.get("equity", 0)
+  engines\stock\risk_manager.py:125:                    or 0
+  engines\stock\risk_manager.py:126:                ),
+  engines\stock\risk_manager.py:127:                2,
+  engines\stock\risk_manager.py:128:            ),
+  engines\stock\risk_manager.py:129:            "today_pnl": round(
+  engines\stock\risk_manager.py:130:                float(
+  engines\stock\risk_manager.py:131:                    self.account.get("today_pnl", 0)
+  engines\stock\risk_manager.py:132:                    or 0
+  engines\stock\risk_manager.py:133:                ),
+  engines\stock\risk_manager.py:134:                2,
+  engines\stock\risk_manager.py:135:            ),
+  engines\stock\risk_manager.py:136:            "trade_count": int(
+  engines\stock\risk_manager.py:137:                self.account.get("trade_count", 0)
+  engines\stock\risk_manager.py:138:                or 0
+  engines\stock\risk_manager.py:139:            ),
+  engines\stock\risk_manager.py:140:            "updated_at": now(),
+  engines\stock\risk_manager.py:141:        }
+  engines\stock\risk_manager.py:142:
+  engines\stock\risk_manager.py:143:        save_json(
+  engines\stock\risk_manager.py:144:            RISK_STATUS,
+  engines\stock\risk_manager.py:145:            result,
+  engines\stock\risk_manager.py:146:        )
+  engines\stock\risk_manager.py:147:
+  engines\stock\risk_manager.py:148:        return result
+  engines\stock\risk_manager.py:149:
+  engines\stock\risk_manager.py:150:    def has_position(self, symbol):
+  engines\stock\risk_manager.py:151:        return any(
+  engines\stock\risk_manager.py:152:            str(position.get("symbol", ""))
+  engines\stock\risk_manager.py:153:            == str(symbol)
+  engines\stock\risk_manager.py:154:            for position in self.positions
+  engines\stock\risk_manager.py:155:        )
+  engines\stock\risk_manager.py:156:
+  engines\stock\risk_manager.py:157:    def get_position(self, symbol):
+  engines\stock\risk_manager.py:158:        for position in self.positions:
+
+
+
+
+  engines\stock\risk_manager.py:162:            ):
+  engines\stock\risk_manager.py:163:                return position
+  engines\stock\risk_manager.py:164:
+  engines\stock\risk_manager.py:165:        return None
+  engines\stock\risk_manager.py:166:
+> engines\stock\risk_manager.py:167:    def evaluate(
+  engines\stock\risk_manager.py:168:        self,
+  engines\stock\risk_manager.py:169:        signal,
+  engines\stock\risk_manager.py:170:        symbol,
+  engines\stock\risk_manager.py:171:        price,
+  engines\stock\risk_manager.py:172:        qty=1,
+  engines\stock\risk_manager.py:173:    ):
+  engines\stock\risk_manager.py:174:        signal = str(
+  engines\stock\risk_manager.py:175:            signal or "WAIT"
+  engines\stock\risk_manager.py:176:        ).upper()
+  engines\stock\risk_manager.py:177:
+  engines\stock\risk_manager.py:178:        symbol = str(
+  engines\stock\risk_manager.py:179:            symbol or ""
+  engines\stock\risk_manager.py:180:        )
+  engines\stock\risk_manager.py:181:
+  engines\stock\risk_manager.py:182:        try:
+  engines\stock\risk_manager.py:183:            price = float(price or 0)
+  engines\stock\risk_manager.py:184:            qty = float(qty or 0)
+  engines\stock\risk_manager.py:185:        except (TypeError, ValueError):
+  engines\stock\risk_manager.py:186:            return self.result(
+  engines\stock\risk_manager.py:187:                False,
+  engines\stock\risk_manager.py:188:                "INVALID_NUMBER",
+  engines\stock\risk_manager.py:189:                signal,
+  engines\stock\risk_manager.py:190:                symbol,
+  engines\stock\risk_manager.py:191:                0,
+  engines\stock\risk_manager.py:192:                0,
+  engines\stock\risk_manager.py:193:            )
+  engines\stock\risk_manager.py:194:
+  engines\stock\risk_manager.py:195:        if MODE != "PAPER_ONLY":
+  engines\stock\risk_manager.py:196:            return self.result(
+  engines\stock\risk_manager.py:197:                False,
+  engines\stock\risk_manager.py:198:                "LIVE_MODE_BLOCKED",
+  engines\stock\risk_manager.py:199:                signal,
+  engines\stock\risk_manager.py:200:                symbol,
+  engines\stock\risk_manager.py:201:                price,
+  engines\stock\risk_manager.py:202:                qty,
+  engines\stock\risk_manager.py:203:            )
+  engines\stock\risk_manager.py:204:
+  engines\stock\risk_manager.py:205:        if signal in (
+  engines\stock\risk_manager.py:206:            "WAIT",
+  engines\stock\risk_manager.py:207:            "HOLD",
+  engines\stock\risk_manager.py:208:            "BLOCK",
+  engines\stock\risk_manager.py:209:        ):
+  engines\stock\risk_manager.py:210:            return self.result(
+  engines\stock\risk_manager.py:211:                False,
+  engines\stock\risk_manager.py:212:                "NO_ORDER_SIGNAL",
+  engines\stock\risk_manager.py:213:                signal,
+  engines\stock\risk_manager.py:214:                symbol,
+  engines\stock\risk_manager.py:215:                price,
+  engines\stock\risk_manager.py:216:                qty,
+  engines\stock\risk_manager.py:217:            )
+  engines\stock\risk_manager.py:218:
+  engines\stock\risk_manager.py:219:        if signal not in (
+  engines\stock\risk_manager.py:220:            "BUY",
+  engines\stock\risk_manager.py:221:            "SELL",
+  engines\stock\risk_manager.py:222:        ):
+  engines\stock\risk_manager.py:223:            return self.result(
+  engines\stock\risk_manager.py:224:                False,
+  engines\stock\risk_manager.py:225:                "INVALID_SIGNAL",
+  engines\stock\risk_manager.py:226:                signal,
+  engines\stock\risk_manager.py:227:                symbol,
+  engines\stock\risk_manager.py:228:                price,
+  engines\stock\risk_manager.py:229:                qty,
+  engines\stock\risk_manager.py:230:            )
+  engines\stock\risk_manager.py:231:
+  engines\stock\risk_manager.py:232:        if not symbol:
+  engines\stock\risk_manager.py:233:            return self.result(
+  engines\stock\risk_manager.py:234:                False,
+  engines\stock\risk_manager.py:235:                "INVALID_SYMBOL",
+  engines\stock\risk_manager.py:236:                signal,
+  engines\stock\risk_manager.py:237:                symbol,
+  engines\stock\risk_manager.py:238:                price,
+  engines\stock\risk_manager.py:239:                qty,
+  engines\stock\risk_manager.py:240:            )
+  engines\stock\risk_manager.py:241:
+  engines\stock\risk_manager.py:242:        if price <= 0:
+  engines\stock\risk_manager.py:243:            return self.result(
+  engines\stock\risk_manager.py:244:                False,
+  engines\stock\risk_manager.py:245:                "INVALID_PRICE",
+  engines\stock\risk_manager.py:246:                signal,
+  engines\stock\risk_manager.py:247:                symbol,
+  engines\stock\risk_manager.py:270:            symbol,
+  engines\stock\risk_manager.py:271:            price,
+  engines\stock\risk_manager.py:272:            qty,
+  engines\stock\risk_manager.py:273:        )
+  engines\stock\risk_manager.py:274:
+> engines\stock\risk_manager.py:275:    def evaluate_buy(
+  engines\stock\risk_manager.py:276:        self,
+  engines\stock\risk_manager.py:277:        symbol,
+  engines\stock\risk_manager.py:278:        price,
+  engines\stock\risk_manager.py:279:        qty,
+  engines\stock\risk_manager.py:280:    ):
+  engines\stock\risk_manager.py:281:        cash = float(
+  engines\stock\risk_manager.py:282:            self.account.get("cash", 0)
+  engines\stock\risk_manager.py:283:            or 0
+  engines\stock\risk_manager.py:284:        )
+  engines\stock\risk_manager.py:285:
+  engines\stock\risk_manager.py:286:        equity = float(
+  engines\stock\risk_manager.py:287:            self.account.get(
+  engines\stock\risk_manager.py:288:                "equity",
+  engines\stock\risk_manager.py:289:                cash,
+  engines\stock\risk_manager.py:290:            )
+  engines\stock\risk_manager.py:291:            or cash
+  engines\stock\risk_manager.py:292:        )
+  engines\stock\risk_manager.py:293:
+  engines\stock\risk_manager.py:294:        initial_cash = float(
+  engines\stock\risk_manager.py:295:            self.account.get(
+  engines\stock\risk_manager.py:296:                "initial_cash",
+  engines\stock\risk_manager.py:297:                10000000.0,
+  engines\stock\risk_manager.py:298:            )
+  engines\stock\risk_manager.py:299:            or 10000000.0
+  engines\stock\risk_manager.py:300:        )
+  engines\stock\risk_manager.py:301:
+  engines\stock\risk_manager.py:302:        today_pnl = float(
+  engines\stock\risk_manager.py:303:            self.account.get("today_pnl", 0)
+  engines\stock\risk_manager.py:304:            or 0
+  engines\stock\risk_manager.py:305:        )
+  engines\stock\risk_manager.py:306:
+  engines\stock\risk_manager.py:307:        trade_count = int(
+  engines\stock\risk_manager.py:308:            self.account.get("trade_count", 0)
+  engines\stock\risk_manager.py:309:            or 0
+  engines\stock\risk_manager.py:310:        )
+  engines\stock\risk_manager.py:311:
+  engines\stock\risk_manager.py:312:        consecutive_losses = int(
+  engines\stock\risk_manager.py:313:            self.account.get(
+  engines\stock\risk_manager.py:314:                "consecutive_losses",
+  engines\stock\risk_manager.py:315:                0,
+  engines\stock\risk_manager.py:316:            )
+  engines\stock\risk_manager.py:317:            or 0
+  engines\stock\risk_manager.py:318:        )
+  engines\stock\risk_manager.py:319:
+  engines\stock\risk_manager.py:320:        order_amount = round(
+  engines\stock\risk_manager.py:321:            price * qty,
+  engines\stock\risk_manager.py:322:            2,
+  engines\stock\risk_manager.py:323:        )
+  engines\stock\risk_manager.py:324:
+  engines\stock\risk_manager.py:325:        max_position_amount = round(
+  engines\stock\risk_manager.py:326:            equity * MAX_POSITION_RATIO,
+  engines\stock\risk_manager.py:327:            2,
+  engines\stock\risk_manager.py:328:        )
+  engines\stock\risk_manager.py:329:
+  engines\stock\risk_manager.py:330:        max_daily_loss = round(
+  engines\stock\risk_manager.py:331:            initial_cash
+  engines\stock\risk_manager.py:332:            * MAX_DAILY_LOSS_RATIO,
+  engines\stock\risk_manager.py:333:            2,
+  engines\stock\risk_manager.py:334:        )
+  engines\stock\risk_manager.py:335:
+  engines\stock\risk_manager.py:336:        if self.has_position(symbol):
+  engines\stock\risk_manager.py:337:            return self.result(
+  engines\stock\risk_manager.py:338:                False,
+  engines\stock\risk_manager.py:339:                "DUPLICATE_POSITION",
+  engines\stock\risk_manager.py:340:                "BUY",
+  engines\stock\risk_manager.py:341:                symbol,
+  engines\stock\risk_manager.py:342:                price,
+  engines\stock\risk_manager.py:343:                qty,
+  engines\stock\risk_manager.py:344:            )
+  engines\stock\risk_manager.py:345:
+  engines\stock\risk_manager.py:346:        if len(self.positions) >= MAX_POSITIONS:
+  engines\stock\risk_manager.py:347:            return self.result(
+  engines\stock\risk_manager.py:348:                False,
+  engines\stock\risk_manager.py:349:                "MAX_POSITIONS",
+  engines\stock\risk_manager.py:350:                "BUY",
+  engines\stock\risk_manager.py:351:                symbol,
+  engines\stock\risk_manager.py:352:                price,
+  engines\stock\risk_manager.py:353:                qty,
+  engines\stock\risk_manager.py:354:            )
+  engines\stock\risk_manager.py:355:
+  engines\stock\risk_manager.py:423:            symbol,
+  engines\stock\risk_manager.py:424:            price,
+  engines\stock\risk_manager.py:425:            qty,
+  engines\stock\risk_manager.py:426:        )
+  engines\stock\risk_manager.py:427:
+> engines\stock\risk_manager.py:428:    def evaluate_sell(
+  engines\stock\risk_manager.py:429:        self,
+  engines\stock\risk_manager.py:430:        symbol,
+  engines\stock\risk_manager.py:431:        price,
+  engines\stock\risk_manager.py:432:        qty,
+  engines\stock\risk_manager.py:433:    ):
+  engines\stock\risk_manager.py:434:        position = self.get_position(symbol)
+  engines\stock\risk_manager.py:435:
+  engines\stock\risk_manager.py:436:        if position is None:
+  engines\stock\risk_manager.py:437:            return self.result(
+  engines\stock\risk_manager.py:438:                False,
+  engines\stock\risk_manager.py:439:                "POSITION_NOT_FOUND",
+  engines\stock\risk_manager.py:440:                "SELL",
+  engines\stock\risk_manager.py:441:                symbol,
+  engines\stock\risk_manager.py:442:                price,
+  engines\stock\risk_manager.py:443:                qty,
+  engines\stock\risk_manager.py:444:            )
+  engines\stock\risk_manager.py:445:
+  engines\stock\risk_manager.py:446:        position_qty = float(
+  engines\stock\risk_manager.py:447:            position.get("qty", 0)
+  engines\stock\risk_manager.py:448:            or 0
+  engines\stock\risk_manager.py:449:        )
+  engines\stock\risk_manager.py:450:
+  engines\stock\risk_manager.py:451:        if qty > position_qty:
+  engines\stock\risk_manager.py:452:            return self.result(
+  engines\stock\risk_manager.py:453:                False,
+  engines\stock\risk_manager.py:454:                "SELL_QTY_EXCEEDED",
+  engines\stock\risk_manager.py:455:                "SELL",
+  engines\stock\risk_manager.py:456:                symbol,
+  engines\stock\risk_manager.py:457:                price,
+  engines\stock\risk_manager.py:458:                qty,
+  engines\stock\risk_manager.py:459:            )
+  engines\stock\risk_manager.py:460:
+  engines\stock\risk_manager.py:461:        return self.result(
+  engines\stock\risk_manager.py:462:            True,
+  engines\stock\risk_manager.py:463:            "APPROVED",
+  engines\stock\risk_manager.py:464:            "SELL",
+  engines\stock\risk_manager.py:465:            symbol,
+  engines\stock\risk_manager.py:466:            price,
+  engines\stock\risk_manager.py:467:            qty,
+  engines\stock\risk_manager.py:468:        )
+  engines\stock\risk_manager.py:469:
+  engines\stock\risk_manager.py:470:
+  engines\stock\risk_manager.py:471:def run(
+  engines\stock\risk_manager.py:472:    signal="WAIT",
+  engines\stock\risk_manager.py:473:    symbol="",
+  engines\stock\risk_manager.py:474:    price=0,
+  engines\stock\risk_manager.py:475:    qty=1,
+  engines\stock\risk_manager.py:476:):
+  engines\stock\risk_manager.py:477:    return RiskManager().evaluate(
+  engines\stock\risk_manager.py:478:        signal=signal,
+  engines\stock\risk_manager.py:479:        symbol=symbol,
+  engines\stock\risk_manager.py:480:        price=price,
+  engines\stock\risk_manager.py:481:        qty=qty,
+  engines\stock\risk_manager.py:482:    )
+  engines\stock\risk_manager.py:483:
+  engines\stock\risk_manager.py:484:
+  engines\stock\risk_manager.py:485:if __name__ == "__main__":
+  engines\stock\risk_manager.py:486:    print(
+  engines\stock\risk_manager.py:487:        json.dumps(
+  engines\stock\risk_manager.py:488:            run(),
+  engines\stock\risk_manager.py:489:            indent=2,
+  engines\stock\risk_manager.py:490:            ensure_ascii=False,
+  engines\stock\risk_manager.py:491:        )
+  engines\stock\risk_manager.py:492:    )
+
+
+
+
+============================================================
+.\engines\stock\execution_ai.py
+============================================================
+
+
+  engines\stock\execution_ai.py:214:            result,
+  engines\stock\execution_ai.py:215:        )
+  engines\stock\execution_ai.py:216:
+  engines\stock\execution_ai.py:217:        return result
+  engines\stock\execution_ai.py:218:
+> engines\stock\execution_ai.py:219:    def run(self):
+  engines\stock\execution_ai.py:220:        portfolio = PortfolioEngine()
+  engines\stock\execution_ai.py:221:        trade_history = TradeHistoryEngine()
+  engines\stock\execution_ai.py:222:        order_manager = OrderManager()
+  engines\stock\execution_ai.py:223:
+  engines\stock\execution_ai.py:224:        decision = self.load(
+  engines\stock\execution_ai.py:225:            DECISION,
+  engines\stock\execution_ai.py:226:            {},
+  engines\stock\execution_ai.py:227:        )
+  engines\stock\execution_ai.py:228:
+  engines\stock\execution_ai.py:229:        signal = str(
+  engines\stock\execution_ai.py:230:            decision.get(
+  engines\stock\execution_ai.py:231:                "signal",
+  engines\stock\execution_ai.py:232:                "WAIT",
+  engines\stock\execution_ai.py:233:            )
+  engines\stock\execution_ai.py:234:            or "WAIT"
+  engines\stock\execution_ai.py:235:        ).upper()
+  engines\stock\execution_ai.py:236:
+  engines\stock\execution_ai.py:237:        score = decision.get(
+  engines\stock\execution_ai.py:238:            "score",
+  engines\stock\execution_ai.py:239:            0,
+  engines\stock\execution_ai.py:240:        )
+  engines\stock\execution_ai.py:241:
+  engines\stock\execution_ai.py:242:        symbol = str(
+  engines\stock\execution_ai.py:243:            decision.get(
+  engines\stock\execution_ai.py:244:                "symbol",
+  engines\stock\execution_ai.py:245:                "",
+  engines\stock\execution_ai.py:246:            )
+  engines\stock\execution_ai.py:247:            or ""
+  engines\stock\execution_ai.py:248:        ).strip()
+  engines\stock\execution_ai.py:249:
+  engines\stock\execution_ai.py:250:        try:
+  engines\stock\execution_ai.py:251:            price = float(
+  engines\stock\execution_ai.py:252:                decision.get(
+  engines\stock\execution_ai.py:253:                    "price",
+  engines\stock\execution_ai.py:254:                    0,
+  engines\stock\execution_ai.py:255:                )
+  engines\stock\execution_ai.py:256:                or 0
+  engines\stock\execution_ai.py:257:            )
+  engines\stock\execution_ai.py:258:        except (TypeError, ValueError):
+  engines\stock\execution_ai.py:259:            price = 0.0
+  engines\stock\execution_ai.py:260:
+  engines\stock\execution_ai.py:261:        try:
+  engines\stock\execution_ai.py:262:            qty = float(
+  engines\stock\execution_ai.py:263:                decision.get(
+  engines\stock\execution_ai.py:264:                    "qty",
+  engines\stock\execution_ai.py:265:                    1,
+  engines\stock\execution_ai.py:266:                )
+  engines\stock\execution_ai.py:267:                or 1
+  engines\stock\execution_ai.py:268:            )
+  engines\stock\execution_ai.py:269:        except (TypeError, ValueError):
+  engines\stock\execution_ai.py:270:            qty = 1.0
+  engines\stock\execution_ai.py:271:
+  engines\stock\execution_ai.py:272:        closed_trade = None
+  engines\stock\execution_ai.py:273:        risk_result = None
+  engines\stock\execution_ai.py:274:        order_result = None
+  engines\stock\execution_ai.py:275:
+  engines\stock\execution_ai.py:276:        history_summary = trade_history.run()
+  engines\stock\execution_ai.py:277:
+  engines\stock\execution_ai.py:278:        if signal not in (
+  engines\stock\execution_ai.py:279:            "BUY",
+  engines\stock\execution_ai.py:280:            "SELL",
+  engines\stock\execution_ai.py:281:        ):
+  engines\stock\execution_ai.py:282:            return self.build_result(
+  engines\stock\execution_ai.py:283:                status="READY",
+  engines\stock\execution_ai.py:284:                signal=signal,
+  engines\stock\execution_ai.py:285:                score=score,
+  engines\stock\execution_ai.py:286:                action="NO_ACTION",
+  engines\stock\execution_ai.py:287:                symbol=symbol,
+  engines\stock\execution_ai.py:288:                price=price,
+  engines\stock\execution_ai.py:289:                qty=qty,
+  engines\stock\execution_ai.py:290:                portfolio=portfolio,
+  engines\stock\execution_ai.py:291:                risk_result=None,
+  engines\stock\execution_ai.py:292:                order_result=None,
+  engines\stock\execution_ai.py:293:                closed_trade=None,
+  engines\stock\execution_ai.py:294:                history_summary=history_summary,
+  engines\stock\execution_ai.py:295:                reason="NO_ORDER_SIGNAL",
+  engines\stock\execution_ai.py:296:            )
+  engines\stock\execution_ai.py:297:
+  engines\stock\execution_ai.py:298:        if not qty.is_integer() or qty <= 0:
+  engines\stock\execution_ai.py:299:            return self.build_result(
+  engines\stock\execution_ai.py:605:            history_summary=history_summary,
+  engines\stock\execution_ai.py:606:            reason="EXECUTED",
+  engines\stock\execution_ai.py:607:        )
+  engines\stock\execution_ai.py:608:
+  engines\stock\execution_ai.py:609:
+> engines\stock\execution_ai.py:610:def run():
+  engines\stock\execution_ai.py:611:    return ExecutionAI().run()
+  engines\stock\execution_ai.py:612:
+  engines\stock\execution_ai.py:613:
+  engines\stock\execution_ai.py:614:if __name__ == "__main__":
+  engines\stock\execution_ai.py:615:    print(
+  engines\stock\execution_ai.py:616:        json.dumps(
+  engines\stock\execution_ai.py:617:            run(),
+  engines\stock\execution_ai.py:618:            indent=2,
+  engines\stock\execution_ai.py:619:            ensure_ascii=False,
+  engines\stock\execution_ai.py:620:        )
+  engines\stock\execution_ai.py:621:    )
+
+
+
+
+============================================================
+ACCOUNT.JSON
+============================================================
+{
+  "initial_cash": 10000000.0,
+  "cash": 9932606.55,
+  "equity": 10002606.55,
+  "today_pnl": 2617.05,
+  "total_pnl": 2606.55,
+  "win": 3,
+  "loss": 0,
+  "win_rate": 100.0,
+  "trade_count": 3,
+  "total_buy_fee": 42.0,
+  "total_sell_fee": 31.95,
+  "total_tax": 319.5,
+  "total_cost": 393.45,
+  "updated_at": "2026-07-24 03:08:13"
+}
+
+============================================================
+POSITIONS.JSON
+============================================================
+[
+  {
+    "symbol": "005930",
+    "side": "BUY",
+    "entry": 70000.0,
+    "entry_price": 70000.0,
+    "current_price": 70000.0,
+    "qty": 1.0,
+    "gross_cost": 70000.0,
+    "cost": 70000.0,
+    "buy_fee": 10.5,
+    "entry_cost": 70010.5,
+    "tp": 71400.0,
+    "sl": 69300.0,
+    "highest_price": 70000.0,
+    "status": "OPEN",
+    "reason": "AI_ENTRY",
+    "strategy": "DUPLICATE_ORDER_TEST",
+    "opened_at": "2026-07-24 03:08:13"
+  }
+]
+
+============================================================
+TRADE_HISTORY.JSON
+============================================================
+{
+  "engine": "trade_history_engine",
+  "mode": "PAPER_ONLY",
+  "trades": [
+    {
+      "symbol": "005930",
+      "side": "SELL",
+      "entry": 70000.0,
+      "exit": 71000.0,
+      "qty": 1.0,
+      "gross_pnl": 1000.0,
+      "buy_fee": 10.5,
+      "sell_fee": 10.65,
+      "tax": 106.5,
+      "total_cost": 127.65,
+      "pnl": 872.35,
+      "reason": "AI_EXIT",
+      "opened_at": "2026-07-24 02:20:25",
+      "closed_at": "2026-07-24 02:23:43"
+    },
+    {
+      "symbol": "005930",
+      "side": "SELL",
+      "entry": 70000.0,
+      "exit": 71000.0,
+      "qty": 1.0,
+      "gross_pnl": 1000.0,
+      "buy_fee": 10.5,
+      "sell_fee": 10.65,
+      "tax": 106.5,
+      "total_cost": 127.65,
+      "pnl": 872.35,
+      "reason": "AI_EXIT",
+      "opened_at": "2026-07-24 02:44:36",
+      "closed_at": "2026-07-24 03:00:13"
+    },
+    {
+      "symbol": "005930",
+      "side": "SELL",
+      "entry": 70000.0,
+      "exit": 71000.0,
+      "qty": 1.0,
+      "gross_pnl": 1000.0,
+      "buy_fee": 10.5,
+      "sell_fee": 10.65,
+      "tax": 106.5,
+      "total_cost": 127.65,
+      "pnl": 872.35,
+      "reason": "AI_EXIT",
+      "strategy": "TEST_ORDER_V2",
+      "opened_at": "2026-07-24 03:04:37",
+      "closed_at": "2026-07-24 03:05:15"
+    }
+  ],
+  "total_trades": 3,
+  "total_pnl": 2617.05,
+  "updated_at": "2026-07-24 03:05:15"
+}
+
+============================================================
+ORDERS.JSON
+============================================================
+{
+  "engine": "order_manager",
+  "mode": "PAPER_ONLY",
+  "orders": [
+    {
+      "order_id": "PAPER-20260724-000001",
+      "client_order_key": "DECISION-05042cc862b80942286f1648",
+      "symbol": "005930",
+      "side": "BUY",
+      "price": 70000.0,
+      "qty": 1,
+      "filled_qty": 1,
+      "remaining_qty": 0,
+      "average_fill_price": 70000.0,
+      "status": "FILLED",
+      "reason": "AI_ENTRY",
+      "strategy": "TEST_ORDER_V1",
+      "reject_reason": "",
+      "cancel_reason": "",
+      "created_at": "2026-07-24 02:44:36",
+      "accepted_at": "2026-07-24 02:44:36",
+      "filled_at": "2026-07-24 02:44:36",
+      "canceled_at": "",
+      "rejected_at": "",
+      "updated_at": "2026-07-24 02:44:36"
+    },
+    {
+      "order_id": "PAPER-20260724-000002",
+      "client_order_key": "DECISION-ef4dd78267bf62921fe33b8e",
+      "symbol": "005930",
+      "side": "SELL",
+      "price": 71000.0,
+      "qty": 1,
+      "filled_qty": 1,
+      "remaining_qty": 0,
+      "average_fill_price": 71000.0,
+      "status": "FILLED",
+      "reason": "AI_EXIT",
+      "strategy": "TEST_ORDER_V1",
+      "reject_reason": "",
+      "cancel_reason": "",
+      "created_at": "2026-07-24 03:00:13",
+      "accepted_at": "2026-07-24 03:00:13",
+      "filled_at": "2026-07-24 03:00:13",
+      "canceled_at": "",
+      "rejected_at": "",
+      "updated_at": "2026-07-24 03:00:13"
+    },
+    {
+      "order_id": "PAPER-20260724-000003",
+      "client_order_key": "DECISION-28a49b7d6d9f4baa1ff2596b",
+      "symbol": "005930",
+      "side": "BUY",
+      "price": 70000.0,
+      "qty": 1,
+      "filled_qty": 1,
+      "remaining_qty": 0,
+      "average_fill_price": 70000.0,
+      "status": "FILLED",
+      "reason": "AI_ENTRY",
+      "strategy": "TEST_ORDER_V2",
+      "reject_reason": "",
+      "cancel_reason": "",
+      "created_at": "2026-07-24 03:04:37",
+      "accepted_at": "2026-07-24 03:04:37",
+      "filled_at": "2026-07-24 03:04:37",
+      "canceled_at": "",
+      "rejected_at": "",
+      "updated_at": "2026-07-24 03:04:37"
+    },
+    {
+      "order_id": "PAPER-20260724-000004",
+      "client_order_key": "DECISION-417c0833477650a78608cc4e",
+      "symbol": "005930",
+      "side": "SELL",
+      "price": 71000.0,
+      "qty": 1,
+      "filled_qty": 1,
+      "remaining_qty": 0,
+      "average_fill_price": 71000.0,
+      "status": "FILLED",
+      "reason": "AI_EXIT",
+      "strategy": "TEST_ORDER_V2",
+      "reject_reason": "",
+      "cancel_reason": "",
+      "created_at": "2026-07-24 03:05:15",
+      "accepted_at": "2026-07-24 03:05:15",
+      "filled_at": "2026-07-24 03:05:15",
+      "canceled_at": "",
+      "rejected_at": "",
+      "updated_at": "2026-07-24 03:05:15"
+    },
+    {
+      "order_id": "PAPER-20260724-000005",
+      "client_order_key": "DECISION-3f243cda5ce68dfe67b04116",
+      "symbol": "005930",
+      "side": "BUY",
+      "price": 70000.0,
+      "qty": 1,
+      "filled_qty": 1,
+      "remaining_qty": 0,
+      "average_fill_price": 70000.0,
+      "status": "FILLED",
+      "reason": "AI_ENTRY",
+      "strategy": "DUPLICATE_ORDER_TEST",
+      "reject_reason": "",
+      "cancel_reason": "",
+      "created_at": "2026-07-24 03:08:13",
+      "accepted_at": "2026-07-24 03:08:13",
+      "filled_at": "2026-07-24 03:08:13",
+      "canceled_at": "",
+      "rejected_at": "",
+      "updated_at": "2026-07-24 03:08:13"
+    }
+  ],
+  "updated_at": "2026-07-24 03:08:13"
+}

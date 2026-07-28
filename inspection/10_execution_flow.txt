@@ -1,0 +1,193 @@
+﻿
+  engines\stock\execution_ai.py:433:                portfolio=portfolio,
+  engines\stock\execution_ai.py:434:                risk_result=risk_result,
+  engines\stock\execution_ai.py:435:                order_result=existing_order,
+  engines\stock\execution_ai.py:436:                closed_trade=None,
+  engines\stock\execution_ai.py:437:                history_summary=history_summary,
+  engines\stock\execution_ai.py:438:                reason="DUPLICATE_CLIENT_ORDER_KEY",
+  engines\stock\execution_ai.py:439:            )
+  engines\stock\execution_ai.py:440:
+  engines\stock\execution_ai.py:441:        order_reason = (
+  engines\stock\execution_ai.py:442:            "AI_ENTRY"
+> engines\stock\execution_ai.py:443:            if signal == "BUY"
+  engines\stock\execution_ai.py:444:            else "AI_EXIT"
+  engines\stock\execution_ai.py:445:        )
+  engines\stock\execution_ai.py:446:
+  engines\stock\execution_ai.py:447:        strategy = str(
+  engines\stock\execution_ai.py:448:            decision.get(
+  engines\stock\execution_ai.py:449:                "strategy",
+  engines\stock\execution_ai.py:450:                "",
+  engines\stock\execution_ai.py:451:            )
+  engines\stock\execution_ai.py:452:            or ""
+  engines\stock\execution_ai.py:453:        ).strip()
+  engines\stock\execution_ai.py:454:
+  engines\stock\execution_ai.py:455:        try:
+  engines\stock\execution_ai.py:456:            order_result = order_manager.create_order(
+  engines\stock\execution_ai.py:457:                symbol=symbol,
+  engines\stock\execution_ai.py:458:                side=signal,
+  engines\stock\execution_ai.py:459:                price=price,
+  engines\stock\execution_ai.py:460:                qty=execution_qty,
+  engines\stock\execution_ai.py:461:                reason=order_reason,
+  engines\stock\execution_ai.py:462:                strategy=strategy,
+  engines\stock\execution_ai.py:463:                client_order_key=client_order_key,
+  engines\stock\execution_ai.py:464:            )
+  engines\stock\execution_ai.py:465:
+  engines\stock\execution_ai.py:466:            order_result = order_manager.accept_order(
+  engines\stock\execution_ai.py:467:                order_result["order_id"]
+  engines\stock\execution_ai.py:468:            )
+  engines\stock\execution_ai.py:469:
+  engines\stock\execution_ai.py:470:            order_result = order_manager.fill_order(
+  engines\stock\execution_ai.py:471:                order_id=order_result["order_id"],
+  engines\stock\execution_ai.py:472:                fill_qty=execution_qty,
+  engines\stock\execution_ai.py:473:                fill_price=price,
+  engines\stock\execution_ai.py:474:            )
+  engines\stock\execution_ai.py:475:
+  engines\stock\execution_ai.py:476:        except (ValueError, KeyError, OSError) as error:
+  engines\stock\execution_ai.py:477:            return self.build_result(
+  engines\stock\execution_ai.py:478:                status="ERROR",
+  engines\stock\execution_ai.py:479:                signal=signal,
+  engines\stock\execution_ai.py:480:                score=score,
+  engines\stock\execution_ai.py:481:                action="ORDER_FAILED",
+  engines\stock\execution_ai.py:482:                symbol=symbol,
+  engines\stock\execution_ai.py:483:                price=price,
+  engines\stock\execution_ai.py:484:                qty=execution_qty,
+  engines\stock\execution_ai.py:485:                portfolio=portfolio,
+  engines\stock\execution_ai.py:486:                risk_result=risk_result,
+  engines\stock\execution_ai.py:487:                order_result=order_result,
+  engines\stock\execution_ai.py:488:                closed_trade=None,
+  engines\stock\execution_ai.py:489:                history_summary=history_summary,
+  engines\stock\execution_ai.py:490:                reason=f"ORDER_MANAGER_ERROR:{error}",
+  engines\stock\execution_ai.py:491:            )
+  engines\stock\execution_ai.py:492:
+> engines\stock\execution_ai.py:493:        if order_result.get("status") != "FILLED":
+  engines\stock\execution_ai.py:494:            return self.build_result(
+  engines\stock\execution_ai.py:495:                status="PENDING",
+  engines\stock\execution_ai.py:496:                signal=signal,
+  engines\stock\execution_ai.py:497:                score=score,
+> engines\stock\execution_ai.py:498:                action="ORDER_NOT_FILLED",
+  engines\stock\execution_ai.py:499:                symbol=symbol,
+  engines\stock\execution_ai.py:500:                price=price,
+  engines\stock\execution_ai.py:501:                qty=execution_qty,
+  engines\stock\execution_ai.py:502:                portfolio=portfolio,
+  engines\stock\execution_ai.py:503:                risk_result=risk_result,
+  engines\stock\execution_ai.py:504:                order_result=order_result,
+  engines\stock\execution_ai.py:505:                closed_trade=None,
+  engines\stock\execution_ai.py:506:                history_summary=history_summary,
+  engines\stock\execution_ai.py:507:                reason="WAITING_FOR_FILL",
+  engines\stock\execution_ai.py:508:            )
+  engines\stock\execution_ai.py:509:
+> engines\stock\execution_ai.py:510:        filled_price = float(
+  engines\stock\execution_ai.py:511:            order_result.get(
+  engines\stock\execution_ai.py:512:                "average_fill_price",
+  engines\stock\execution_ai.py:513:                price,
+  engines\stock\execution_ai.py:514:            )
+  engines\stock\execution_ai.py:515:            or price
+  engines\stock\execution_ai.py:516:        )
+  engines\stock\execution_ai.py:517:
+> engines\stock\execution_ai.py:518:        filled_qty = int(
+  engines\stock\execution_ai.py:519:            order_result.get(
+> engines\stock\execution_ai.py:520:                "filled_qty",
+  engines\stock\execution_ai.py:521:                execution_qty,
+  engines\stock\execution_ai.py:522:            )
+  engines\stock\execution_ai.py:523:            or execution_qty
+  engines\stock\execution_ai.py:524:        )
+  engines\stock\execution_ai.py:525:
+> engines\stock\execution_ai.py:526:        if signal == "BUY":
+> engines\stock\execution_ai.py:527:            success = portfolio.add_position(
+  engines\stock\execution_ai.py:528:                symbol=symbol,
+  engines\stock\execution_ai.py:529:                side="BUY",
+> engines\stock\execution_ai.py:530:                price=filled_price,
+> engines\stock\execution_ai.py:531:                qty=filled_qty,
+  engines\stock\execution_ai.py:532:                reason="AI_ENTRY",
+  engines\stock\execution_ai.py:533:                strategy=order_result.get(
+  engines\stock\execution_ai.py:534:                    "strategy",
+  engines\stock\execution_ai.py:535:                    "UNSPECIFIED",
+  engines\stock\execution_ai.py:536:                ),
+  engines\stock\execution_ai.py:537:            )
+  engines\stock\execution_ai.py:538:
+  engines\stock\execution_ai.py:539:            if not success:
+  engines\stock\execution_ai.py:540:                return self.build_result(
+  engines\stock\execution_ai.py:541:                    status="ERROR",
+  engines\stock\execution_ai.py:542:                    signal=signal,
+  engines\stock\execution_ai.py:543:                    score=score,
+  engines\stock\execution_ai.py:544:                    action="BUY_RECONCILIATION_REQUIRED",
+  engines\stock\execution_ai.py:545:                    symbol=symbol,
+> engines\stock\execution_ai.py:546:                    price=filled_price,
+> engines\stock\execution_ai.py:547:                    qty=filled_qty,
+  engines\stock\execution_ai.py:548:                    portfolio=portfolio,
+  engines\stock\execution_ai.py:549:                    risk_result=risk_result,
+  engines\stock\execution_ai.py:550:                    order_result=order_result,
+  engines\stock\execution_ai.py:551:                    closed_trade=None,
+  engines\stock\execution_ai.py:552:                    history_summary=history_summary,
+> engines\stock\execution_ai.py:553:                    reason="ORDER_FILLED_PORTFOLIO_BUY_FAILED",
+  engines\stock\execution_ai.py:554:                )
+  engines\stock\execution_ai.py:555:
+  engines\stock\execution_ai.py:556:            action = "PAPER_BUY"
+  engines\stock\execution_ai.py:557:
+  engines\stock\execution_ai.py:558:        else:
+> engines\stock\execution_ai.py:559:            closed_trade = portfolio.close_position(
+  engines\stock\execution_ai.py:560:                position=matching_position,
+> engines\stock\execution_ai.py:561:                exit_price=filled_price,
+  engines\stock\execution_ai.py:562:                reason="AI_EXIT",
+  engines\stock\execution_ai.py:563:            )
+  engines\stock\execution_ai.py:564:
+  engines\stock\execution_ai.py:565:            if not isinstance(
+  engines\stock\execution_ai.py:566:                closed_trade,
+  engines\stock\execution_ai.py:567:                dict,
+  engines\stock\execution_ai.py:568:            ):
+  engines\stock\execution_ai.py:569:                return self.build_result(
+  engines\stock\execution_ai.py:570:                    status="ERROR",
+  engines\stock\execution_ai.py:571:                    signal=signal,
+  engines\stock\execution_ai.py:572:                    score=score,
+  engines\stock\execution_ai.py:573:                    action="SELL_RECONCILIATION_REQUIRED",
+  engines\stock\execution_ai.py:574:                    symbol=symbol,
+> engines\stock\execution_ai.py:575:                    price=filled_price,
+> engines\stock\execution_ai.py:576:                    qty=filled_qty,
+  engines\stock\execution_ai.py:577:                    portfolio=portfolio,
+  engines\stock\execution_ai.py:578:                    risk_result=risk_result,
+  engines\stock\execution_ai.py:579:                    order_result=order_result,
+  engines\stock\execution_ai.py:580:                    closed_trade=None,
+  engines\stock\execution_ai.py:581:                    history_summary=history_summary,
+> engines\stock\execution_ai.py:582:                    reason="ORDER_FILLED_PORTFOLIO_SELL_FAILED",
+  engines\stock\execution_ai.py:583:                )
+  engines\stock\execution_ai.py:584:
+> engines\stock\execution_ai.py:585:            trade_history.add_trade(
+  engines\stock\execution_ai.py:586:                closed_trade
+  engines\stock\execution_ai.py:587:            )
+  engines\stock\execution_ai.py:588:
+  engines\stock\execution_ai.py:589:            action = "PAPER_SELL"
+  engines\stock\execution_ai.py:590:
+  engines\stock\execution_ai.py:591:        history_summary = trade_history.run()
+  engines\stock\execution_ai.py:592:
+  engines\stock\execution_ai.py:593:        return self.build_result(
+  engines\stock\execution_ai.py:594:            status="READY",
+  engines\stock\execution_ai.py:595:            signal=signal,
+  engines\stock\execution_ai.py:596:            score=score,
+  engines\stock\execution_ai.py:597:            action=action,
+  engines\stock\execution_ai.py:598:            symbol=symbol,
+> engines\stock\execution_ai.py:599:            price=filled_price,
+> engines\stock\execution_ai.py:600:            qty=filled_qty,
+  engines\stock\execution_ai.py:601:            portfolio=portfolio,
+  engines\stock\execution_ai.py:602:            risk_result=risk_result,
+  engines\stock\execution_ai.py:603:            order_result=order_result,
+  engines\stock\execution_ai.py:604:            closed_trade=closed_trade,
+  engines\stock\execution_ai.py:605:            history_summary=history_summary,
+  engines\stock\execution_ai.py:606:            reason="EXECUTED",
+  engines\stock\execution_ai.py:607:        )
+  engines\stock\execution_ai.py:608:
+  engines\stock\execution_ai.py:609:
+  engines\stock\execution_ai.py:610:def run():
+  engines\stock\execution_ai.py:611:    return ExecutionAI().run()
+  engines\stock\execution_ai.py:612:
+  engines\stock\execution_ai.py:613:
+  engines\stock\execution_ai.py:614:if __name__ == "__main__":
+  engines\stock\execution_ai.py:615:    print(
+  engines\stock\execution_ai.py:616:        json.dumps(
+  engines\stock\execution_ai.py:617:            run(),
+  engines\stock\execution_ai.py:618:            indent=2,
+  engines\stock\execution_ai.py:619:            ensure_ascii=False,
+  engines\stock\execution_ai.py:620:        )
+  engines\stock\execution_ai.py:621:    )
+
+
+

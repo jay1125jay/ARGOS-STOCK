@@ -1,0 +1,62 @@
+﻿C:\ARGOS_STOCK\run_argos.py:184: closed_trades = check_all_exits(results)
+C:\ARGOS_STOCK\run_argos.py:186: for trade in closed_trades:
+C:\ARGOS_STOCK\run_argos_backup_v43.py:124: closed_trades = check_all_exits(results)
+C:\ARGOS_STOCK\run_argos_backup_v43.py:126: for trade in closed_trades:
+C:\ARGOS_STOCK\engines\position_manager.py:130: closed_trades = []
+C:\ARGOS_STOCK\engines\position_manager.py:148: closed_trades.append(build_trade(position, price, "TIME_STOP", remaining_size))
+C:\ARGOS_STOCK\engines\position_manager.py:161: closed_trades.append(build_trade(position, price, "TP1", close_size))
+C:\ARGOS_STOCK\engines\position_manager.py:178: closed_trades.append(build_trade(position, price, "TP2", remaining_size))
+C:\ARGOS_STOCK\engines\position_manager.py:190: closed_trades.append(build_trade(position, price, exit_reason, remaining_size))
+C:\ARGOS_STOCK\engines\position_manager.py:197: return closed_trades
+C:\ARGOS_STOCK\engines\stock\auto_runner.py:22: from engines.stock.execution_ai import ExecutionAI
+C:\ARGOS_STOCK\engines\stock\auto_runner.py:23: from engines.stock.trade_history_engine import TradeHistoryEngine
+C:\ARGOS_STOCK\engines\stock\auto_runner.py:24: from engines.stock.portfolio_engine import PortfolioEngine
+C:\ARGOS_STOCK\engines\stock\auto_runner.py:25: from engines.stock.pnl_engine import PnLEngine
+C:\ARGOS_STOCK\engines\stock\auto_runner.py:150: lambda: ExecutionAI().run()
+C:\ARGOS_STOCK\engines\stock\auto_runner.py:154: portfolio_engine = PortfolioEngine()
+C:\ARGOS_STOCK\engines\stock\auto_runner.py:169: lambda: TradeHistoryEngine().run()
+C:\ARGOS_STOCK\engines\stock\auto_runner.py:174: lambda: PnLEngine().run()
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:7: from engines.stock.portfolio_engine import PortfolioEngine
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:8: from engines.stock.risk_manager import RiskManager
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:9: from engines.stock.trade_history_engine import TradeHistoryEngine
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:28: class ExecutionAI:
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:184: closed_trade,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:204: "closed_trade": closed_trade,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:220: portfolio = PortfolioEngine()
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:221: trade_history = TradeHistoryEngine()
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:272: closed_trade = None
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:293: closed_trade=None,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:310: closed_trade=None,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:317: risk_result = RiskManager().evaluate(
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:339: closed_trade=None,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:375: closed_trade=None,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:406: closed_trade=None,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:436: closed_trade=None,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:488: closed_trade=None,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:505: closed_trade=None,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:551: closed_trade=None,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:559: closed_trade = portfolio.close_position(
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:566: closed_trade,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:580: closed_trade=None,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:585: trade_history.add_trade(
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:586: closed_trade
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:604: closed_trade=closed_trade,
+C:\ARGOS_STOCK\engines\stock\execution_ai.py:611: return ExecutionAI().run()
+C:\ARGOS_STOCK\engines\stock\order_manager.py:24: 이 엔진은 PortfolioEngine을 직접 호출하지 않는다.
+C:\ARGOS_STOCK\engines\stock\order_manager.py:25: 실제 포트폴리오 반영은 ExecutionAI가 FILLED 상태를 확인한 뒤 수행한다.
+C:\ARGOS_STOCK\engines\stock\order_manager.py:383: ExecutionAI가 동일 신호를 다시 전달하면
+C:\ARGOS_STOCK\engines\stock\paper_runner.py:9: from engines.stock.portfolio_engine import PortfolioEngine
+C:\ARGOS_STOCK\engines\stock\paper_runner.py:10: from engines.stock.trade_history_engine import TradeHistoryEngine
+C:\ARGOS_STOCK\engines\stock\paper_runner.py:23: self.portfolio = PortfolioEngine()
+C:\ARGOS_STOCK\engines\stock\paper_runner.py:24: self.trade_history = TradeHistoryEngine()
+C:\ARGOS_STOCK\engines\stock\paper_runner.py:75: self.trade_history.add_trade(
+C:\ARGOS_STOCK\engines\stock\paper_runner.py:88: self.trade_history.add_trade(
+C:\ARGOS_STOCK\engines\stock\pnl_engine.py:33: class PnLEngine:
+C:\ARGOS_STOCK\engines\stock\pnl_engine.py:174: PnLEngine().run()
+C:\ARGOS_STOCK\engines\stock\portfolio_engine.py:69: class PortfolioEngine:
+C:\ARGOS_STOCK\engines\stock\portfolio_engine.py:698: portfolio = PortfolioEngine()
+C:\ARGOS_STOCK\engines\stock\risk_manager.py:76: class RiskManager:
+C:\ARGOS_STOCK\engines\stock\risk_manager.py:477: return RiskManager().evaluate(
+C:\ARGOS_STOCK\engines\stock\trade_history_engine.py:15: class TradeHistoryEngine:
+C:\ARGOS_STOCK\engines\stock\trade_history_engine.py:65: def add_trade(self, trade):
+C:\ARGOS_STOCK\engines\stock\trade_history_engine.py:140: return TradeHistoryEngine().run()

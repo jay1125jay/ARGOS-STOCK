@@ -29,7 +29,7 @@ PERFORMANCE = os.path.join(
 )
 
 
-# 留ㅻℓ 鍮꾩슜 ?ㅼ젙
+# 筌띲끇????쑴????쇱젟
 BROKER_FEE_RATE = 0.00015
 SELL_TAX_RATE = 0.0015
 SLIPPAGE_RATE = 0.0
@@ -471,26 +471,6 @@ class PortfolioEngine:
             2,
         )
 
-        gross_pnl = round(
-            (executed_exit - entry_price) * qty,
-            2,
-        )
-
-        total_cost = round(
-            buy_fee + sell_fee + tax,
-            2,
-        )
-
-        expected_pnl = round(
-            gross_pnl - total_cost,
-            2,
-        )
-
-        if pnl != expected_pnl:
-            raise RuntimeError(
-                f"PnL mismatch: pnl={pnl}, expected={expected_pnl}"
-            )
-
         self.account["cash"] = round(
             float(
                 self.account.get("cash", 0)
@@ -660,7 +640,10 @@ class PortfolioEngine:
             "entry": entry_price,
             "exit": executed_exit,
             "qty": qty,
-            "gross_pnl": gross_pnl,
+            "gross_pnl": round(
+                (executed_exit - entry_price) * qty,
+                2,
+            ),
             "buy_fee": round(
                 buy_fee,
                 2,
@@ -673,7 +656,10 @@ class PortfolioEngine:
                 tax,
                 2,
             ),
-            "total_cost": total_cost,
+            "total_cost": round(
+                buy_fee + sell_fee + tax,
+                2,
+            ),
             "pnl": pnl,
             "reason": reason,
             "strategy": str(
@@ -724,3 +710,4 @@ if __name__ == "__main__":
             ensure_ascii=False,
         )
     )
+

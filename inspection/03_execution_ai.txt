@@ -463,51 +463,15 @@ class ExecutionAI:
                 client_order_key=client_order_key,
             )
 
-            if not isinstance(order_result, dict):
-                raise TypeError("create_order() must return dict")
-
-            if not order_result.get("order_id"):
-                raise RuntimeError("create_order() returned no order_id")
-
             order_result = order_manager.accept_order(
                 order_result["order_id"]
             )
-            
-            if not isinstance(order_result, dict):
-                raise TypeError("accept_order() must return dict")
-
-            if not order_result.get("order_id"):
-                raise RuntimeError("accept_order() returned no order_id")
 
             order_result = order_manager.fill_order(
                 order_id=order_result["order_id"],
                 fill_qty=execution_qty,
                 fill_price=price,
             )
-
-            if order_result is None:
-                raise RuntimeError("fill_order() returned None")
-
-            if not isinstance(order_result, dict):
-                raise TypeError("fill_order() must return dict")
-
-            if not order_result.get("status"):
-                raise RuntimeError("fill_order() returned no status")
-
-            if order_result.get("status") != "FILLED":
-                return self.build_result(
-                    status="BLOCK",
-                    signal=signal,
-                    score=score,
-                    ction="ORDER_NOT_FILLED",
-                    symbol=symbol,
-                    price=price,
-                    qty=execution_qty,
-                    portfolio=portfolio,
-                    risk_result=risk_result,
-                    order_result=order_result,
-                    reason=f"ORDER_STATUS:{order_result.get('status')}",
-                )
 
         except (ValueError, KeyError, OSError) as error:
             return self.build_result(
@@ -551,18 +515,6 @@ class ExecutionAI:
             or price
         )
 
-        if abs(filled_price - price) / price > 0.30:
-            raise ValueError(
-                f"Abnormal fill price detected "
-                f"(order={price}, fill={filled_price})"
-            )
-
-        if price <= 0:
-            raise ValueError(f"Invalid order price: {price}")
-
-        if filled_price <= 0:
-            raise ValueError(f"Invalid filled price: {filled_price}")
-
         filled_qty = int(
             order_result.get(
                 "filled_qty",
@@ -570,51 +522,6 @@ class ExecutionAI:
             )
             or execution_qty
         )
-
-        if filled_qty > execution_qty:
-            raise ValueError(
-                f"Filled quantity exceeds requested quantity "
-                f"({filled_qty} > {execution_qty})"
-            )
-
-        if filled_qty < 0:
-            raise ValueError(
-                f"Invalid filled quantity: {filled_qty}"
-            )
-
-        if filled_price <= 0:
-            return self.build_result(
-                status="ERROR",
-                signal=signal,
-                score=score,
-                action="INVALID_FILL_RESULT",
-                symbol=symbol,
-                price=filled_price,
-                qty=filled_qty,
-                portfolio=portfolio,
-                risk_result=risk_result,
-                order_result=order_result,
-                closed_trade=None,
-                history_summary=history_summary,
-                reason="INVALID_FILLED_PRICE",
-            )
-
-        if filled_qty <= 0:
-            return self.build_result(
-                status="ERROR",
-                signal=signal,
-                score=score,
-                action="INVALID_FILL_RESULT",
-                symbol=symbol,
-                price=filled_price,
-                qty=filled_qty,
-                portfolio=portfolio,
-                risk_result=risk_result,
-                order_result=order_result,
-                closed_trade=None,
-                history_summary=history_summary,
-                reason="INVALID_FILLED_QTY",
-            )
 
         if signal == "BUY":
             success = portfolio.add_position(
@@ -675,26 +582,29 @@ class ExecutionAI:
                     reason="ORDER_FILLED_PORTFOLIO_SELL_FAILED",
                 )
 
-            try:
-                trade_history.add_trade(
-                    closed_trade
-                )
-            except Exception as e:
-                return self.build_result(
-                    status="ERROR",
-                    signal=signal,
-                    score=score,
-                    action="HISTORY_SAVE_FAILED",
-                    symbol=symbol,
-                    price=filled_price,
-                    qty=filled_qty,
-                    portfolio=portfolio,
-                    risk_result=risk_result,
-                    order_result=order_result,
-                    closed_trade=closed_trade,
-                    history_summary=history_summary,
-                    reason=f"TRADE_HISTORY_ERROR:{e}",
-                )
+            trade_history.add_trade(
+                closed_trade
+            )
+
+            action = "PAPER_SELL"
+
+        history_summary = trade_history.run()
+
+        return self.build_result(
+            status="READY",
+            signal=signal,
+            score=score,
+            action=action,
+            symbol=symbol,
+            price=filled_price,
+            qty=filled_qty,
+            portfolio=portfolio,
+            risk_result=risk_result,
+            order_result=order_result,
+            closed_trade=closed_trade,
+            history_summary=history_summary,
+            reason="EXECUTED",
+        )
 
 
 def run():
@@ -709,3 +619,4 @@ if __name__ == "__main__":
             ensure_ascii=False,
         )
     )
+
