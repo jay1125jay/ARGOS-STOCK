@@ -679,7 +679,7 @@ class ExecutionAI:
                 trade_history.add_trade(
                     closed_trade
                 )
-            except Exception as e:
+            except Exception as error:
                 return self.build_result(
                     status="ERROR",
                     signal=signal,
@@ -693,8 +693,28 @@ class ExecutionAI:
                     order_result=order_result,
                     closed_trade=closed_trade,
                     history_summary=history_summary,
-                    reason=f"TRADE_HISTORY_ERROR:{e}",
+                    reason=f"TRADE_HISTORY_ERROR:{error}",
                 )
+
+            action = "PAPER_SELL"
+
+        history_summary = trade_history.run()
+
+        return self.build_result(
+            status="FILLED",
+            signal=signal,
+            score=score,
+            action=action,
+            symbol=symbol,
+            price=filled_price,
+            qty=filled_qty,
+            portfolio=portfolio,
+            risk_result=risk_result,
+            order_result=order_result,
+            closed_trade=closed_trade,
+            history_summary=history_summary,
+            reason="EXECUTED",
+        )
 
 
 def run():
