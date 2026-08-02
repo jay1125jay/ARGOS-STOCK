@@ -31,3 +31,27 @@ data/system/
 data/technical/
 data/runner/auto_runner_status.json
 data/runner/auto_runner_stop.flag
+# ARGOS generated test files
+/argos_*_check.txt
+/auto_runner_*.txt
+/chief_sell_fix_source.txt
+/decision_sell_fix_test.txt
+/execution_ai_source.txt
+/execution_final_result_fix.txt
+/git_*_result.txt
+/held_sell_*.txt
+/ranking_check.txt
+/sell_*_test.txt
+/sell_fix_final_validation.txt
+/sell_flow_fix_source.txt
+/engines/stock/*.bak_*
+
+# ARGOS runtime status and cache
+/data/decision/final_decision.json
+/data/execution/execution_status.json
+/data/indicator/indicator_status.json
+/data/learning/learning_status.json
+/data/portfolio/performance.json
+/data/ranking/ranking_status.json
+/data/stock/kis_accum_cache.json
+/data/stock/kis_cursor.json
